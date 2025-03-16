@@ -128,6 +128,7 @@ class HomeController extends Controller
                 'title',
                 'slug',
                 'cover',
+                'completed',
                 'description',
                 'created_at',
                 'updated_at'

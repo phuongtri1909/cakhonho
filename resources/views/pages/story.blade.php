@@ -1,5 +1,4 @@
 @extends('layouts.app')
-@extends('layouts.app')
 
 @section('title', $story->title . ' - Đọc truyện online | ' . config('app.name'))
 

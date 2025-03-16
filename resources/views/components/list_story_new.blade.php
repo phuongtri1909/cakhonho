@@ -5,11 +5,11 @@
             <div class="content-wrapper">
                 <div class="section-header">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h1 class="section-title">
-                            <i class="fas fa-clock text-primary me-2 fa-xl cl-00b894"></i>Truyện Mới
-                        </h1>
+                        <h2 class="fs-5 m-0 text-dark">
+                            <i class="fas fa-clock text-primary me-2 fa-xl cl-00b894"></i>Mới Cập Nhật
+                        </h2>
                         <div class="category-filter">
-                            <select class="form-select custom-select" id="newStoryCategoryFilter">
+                            <select class="form-select custom-select rounded-4" id="newStoryCategoryFilter">
                                 <option value="">Tất cả thể loại</option>
                                 @foreach ($categories as $category)
                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -28,6 +28,12 @@
 
         <!-- Sidebar -->
         <div class="col-12 col-md-5 col-lg-4 mt-3 mt-sm-0">
+
+            {{-- hot stories --}}
+            @include('components.hot_stories')
+
+            {{-- full stories --}}
+
             <!-- Recently Read Stories -->
             @include('components.recent-reads')
 
@@ -80,8 +86,8 @@
             }
 
             .story-thumb {
-                width: 60px;
-                height: 80px;
+                width: 90px;
+                height: 130px;
                 object-fit: cover;
                 border-radius: 4px;
             }

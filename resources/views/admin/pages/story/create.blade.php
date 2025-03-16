@@ -66,7 +66,7 @@
                                     <label for="status">Trạng thái</label>
                                     <select name="status" id="status" class="form-control">
                                         <option value="draft">Bản nháp</option>
-                                        <option value="published">Xuất bản</option>
+                                        <option value="published" selected>Xuất bản</option>
                                     </select>
                                 </div>
                             </div>

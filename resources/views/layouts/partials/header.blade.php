@@ -74,7 +74,7 @@
                 <div class="d-flex align-items-center w-100">
                     <!-- Logo -->
                     <a class="navbar-brand p-0" href="{{ route('home') }}">
-                        <img height="50" src="{{ $logoPath }}" alt="{{ config('app.name') }} logo">
+                        <img height="70" src="{{ $logoPath }}" alt="{{ config('app.name') }} logo">
                     </a>
 
                     <div class="d-flex align-items-center w-100 justify-content-between flex-lg-row">

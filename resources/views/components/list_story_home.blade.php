@@ -1,10 +1,10 @@
 <section>
     <div class="mt-4">
         <!-- Header Section -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="section-title"><i class="fa-solid fa-fire fa-xl" style="color: #fdae3f;"></i> Truyện Hot</h1>
-            <div class="category-filter">
-                <select class="form-select" id="categoryFilter">
+        <div class="d-flex justify-content-between align-items-center bg-8ed7ff px-3 pb-3 pt-1 rounded-top-custom">
+            <h2 class="fs-5 m-0 text-dark"><i class="fa-solid fa-fire fa-xl" style="color: #ffe371;"></i> Truyện Hot</h2>
+            <div>
+                <select class="form-select shadow-sm rounded-4" id="categoryFilter" style="min-width: 200px;">
                     <option selected value="">Tất cả thể loại</option>
                     @foreach ($categories as $category)
                         <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -14,16 +14,14 @@
         </div>
 
         <!-- Stories Grid -->
-        <div id="storiesContainer">
+        <div id="storiesContainer" class="bg-white rounded-bottom-custom">
             @include('components.stories-grid', ['hotStories' => $hotStories])
         </div>
     </div>
 </section>
 
 @once
-
     @push('scripts')
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
             $(document).ready(function() {
                 $('#categoryFilter').change(function() {
@@ -58,29 +56,21 @@
 
     @push('styles')
         <style>
+
+            .rounded-bottom-custom {
+                border-bottom-left-radius: 1rem !important;
+                border-bottom-right-radius: 1rem !important;
+            }
+
+            .rounded-top-custom {
+                border-top-left-radius: 1rem !important;
+                border-top-right-radius: 1rem !important;
+            }
+
+            /* Remaining styles that can't be replaced by Bootstrap */
             #storiesContainer.loading {
                 opacity: 0.6;
                 pointer-events: none;
-            }
-
-            /* Header Styles */
-            .section-title {
-                font-size: 1.5rem;
-                font-weight: 600;
-                margin: 0;
-                color: #333;
-            }
-
-            .category-filter .form-select {
-                min-width: 200px;
-                border-radius: 8px;
-                border: 2px solid #eee;
-                transition: border-color 0.3s ease;
-            }
-
-            .category-filter .form-select:focus {
-                border-color: #007bff;
-                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
             }
 
             /* Story Card Styles */
@@ -91,10 +81,7 @@
             }
 
             .story-card {
-                background: white;
-                border-radius: 12px;
                 overflow: hidden;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
                 transition: all 0.3s ease;
                 height: 100%;
                 position: relative;
@@ -102,7 +89,6 @@
 
             .story-card:hover {
                 transform: translateY(-5px);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             }
 
             /* Thumbnail Styles */
@@ -118,12 +104,12 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
-                object-fit: cover;
+                object-fit: scale-down;
                 transition: transform 0.3s ease;
             }
 
             .story-card:hover .story-thumbnail img {
-                transform: scale(1.05);
+                transform: translateY(-5px);
             }
 
             /* Hover Effect Styles */
@@ -160,55 +146,18 @@
                 transform: translateY(0);
             }
 
-            /* Story Info Styles */
-            .story-info {
-                padding: 12px;
-                background: white;
-            }
-
-            .story-stats-container {
-                margin-bottom: 8px;
-            }
-
-            .story-stats-container .d-flex {
-                color: #6c757d;
-                font-size: 0.85rem;
-            }
-
-            .story-stats-container .eye {
-                color: #007bff;
-                margin-right: 4px;
-            }
-
-            .story-stats-container .star {
-                color: #f5d02d;
-                margin-right: 4px;
-            }
-
+            /* Story title height limiting */
             .story-title {
-                font-size: 0.9rem;
-                margin: 0;
-                line-height: 1.4;
                 height: 2.5em;
                 overflow: hidden;
                 display: -webkit-box;
                 -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
-                text-align: center;
             }
 
-            .story-title a {
-                color: #333;
-                text-decoration: none;
-                transition: color 0.3s ease;
-            }
-
-            .story-title a:hover {
-                color: #007bff;
-            }
-
-            /* Category Badge Styles */
-            .story-categories {
+            /* Category Badge Styles - special styling */
+                        /* Category Badge Styles */
+                        .story-categories {
                 display: flex;
                 flex-wrap: wrap;
                 gap: 4px;
@@ -268,26 +217,10 @@
             .story-item:nth-child(6) {
                 animation-delay: 0.6s;
             }
-
-            /* Responsive Styles */
-            @media (max-width: 768px) {
-                .section-title {
-                    font-size: 1.25rem;
-                }
-
-                .category-filter .form-select {
-                    min-width: 120px;
-                    font-size: 0.9rem;
-                }
-
-                .story-title {
-                    font-size: 0.85rem;
-                }
-
-                .story-stats-container {
-                    font-size: 0.8rem;
-                }
-            }
         </style>
     @endpush
 @endonce
+
+
+
+           

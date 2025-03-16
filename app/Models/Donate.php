@@ -13,5 +13,6 @@ class Donate extends Model
         'title',
         'image_qr',
         'description',
+        'about_us',
     ];
 }

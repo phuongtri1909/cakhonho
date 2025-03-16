@@ -1,7 +1,7 @@
 @include('layouts.partials.header')
 
 <body data-auth="{{ auth()->check() ? 'true' : 'false' }}">
-    <div class="mt-68">
+    <div class="mt-88">
         @include('components.toast')
         @include('components.toast-main')
         

@@ -10,7 +10,8 @@
                         <p class="mb-2 text-start">Thể loại:</p>
                         <div class="d-flex flex-wrap gap-2">
                             @foreach ($storyCategories as $category)
-                                <a href="{{ route('categories.story.show', $category['slug']) }}" class="category-tag fs-9">
+                                <a href="{{ route('categories.story.show', $category['slug']) }}"
+                                    class="category-tag fs-9">
                                     {{ $category['name'] }}
 
                                 </a>
@@ -33,26 +34,35 @@
 
                     <div class="d-flex justify-content-start gap-3">
                         <div class="stat-item text-dark">
-                            <i class="fas fa-book-open me-1 text-danger"></i>
+                            <i class="fas fa-book-open me-1 cl-8ed7ff"></i>
                             <span class="counter" data-target="{{ $stats['total_chapters'] }}">0</span>
                             <span>Chương</span>
                         </div>
-                        {{-- <div class="stat-item text-dark">
+                        <div class="stat-item text-dark">
                             <i class="fas fa-eye eye text-primary"></i>
                             <span class="counter" data-target="{{ $stats['total_views'] }}">0</span>
                             <span>Lượt Xem</span>
-                        </div> --}}
+                        </div>
                         <div class="stat-item text-dark">
-                            <i class="fas fa-star star text-warning"></i>
+                            <i class="fas fa-star star cl-ffe371"></i>
                             <span class="counter" data-target="{{ $stats['ratings']['count'] }}">0</span>
                             <span>đánh giá</span>
                         </div>
 
                     </div>
                     <div>
-                        <p class="text-muted
-                            mt-4 mb-0 text-justify">
-                            {!! $story->description!!}
+                        <div class="description-container">
+                            <div class="description-content text-muted mt-4 mb-0 text-justify"
+                                id="description-content-{{ $story->id }}">
+                                {!! $story->description !!}
+                            </div>
+                            <div class="description-toggle-btn mt-2 text-center d-none">
+                                <button class="btn btn-sm btn-link show-more-btn">Xem thêm <i
+                                        class="fas fa-chevron-down"></i></button>
+                                <button class="btn btn-sm btn-link show-less-btn d-none">Thu gọn <i
+                                        class="fas fa-chevron-up"></i></button>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
@@ -218,11 +228,11 @@
         }
 
         .rating-star.full {
-            color: #ffc107;
+            color: #ffe371;
         }
 
         .rating-star.hover {
-            color: #ffc107;
+            color: #ffe371;
             transform: scale(1.2);
         }
 
@@ -257,12 +267,91 @@
 
         #average-rating {
             font-weight: bold;
-            color: #ffc107;
+            color: #ffe371;
+        }
+
+        .description-content {
+            max-height: 180px;
+            /* Approx height for 10 lines - adjust as needed */
+            overflow: hidden;
+            position: relative;
+            transition: max-height 0.5s ease;
+        }
+
+        .description-content.expanded {
+            max-height: 5000px;
+            /* Large enough to contain any description */
+        }
+
+        .description-content:not(.expanded)::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(transparent, #dcdcdc);
+            pointer-events: none;
+        }
+
+        .description-toggle-btn .btn-link {
+            color: #4350ff;
+            text-decoration: none;
+            padding: 5px 15px;
+            border-radius: 15px;
+            background-color: rgba(67, 80, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .description-toggle-btn .btn-link:hover {
+            background-color: rgba(67, 80, 255, 0.2);
         }
     </style>
 @endpush
 
 @push('scripts')
+    <script>
+        // Description show more/less functionality
+        function initDescriptionToggle() {
+            const descriptionContent = document.getElementById('description-content-{{ $story->id }}');
+            const toggleBtnContainer = document.querySelector('.description-toggle-btn');
+            const showMoreBtn = document.querySelector('.show-more-btn');
+            const showLessBtn = document.querySelector('.show-less-btn');
+
+            if (descriptionContent && toggleBtnContainer) {
+                // Check if content height exceeds the max-height
+                if (descriptionContent.scrollHeight > descriptionContent.offsetHeight) {
+                    // Content is taller than the container, show the toggle button
+                    toggleBtnContainer.classList.remove('d-none');
+
+                    showMoreBtn.addEventListener('click', function() {
+                        descriptionContent.classList.add('expanded');
+                        showMoreBtn.classList.add('d-none');
+                        showLessBtn.classList.remove('d-none');
+                    });
+
+                    showLessBtn.addEventListener('click', function() {
+                        descriptionContent.classList.remove('expanded');
+                        showLessBtn.classList.add('d-none');
+                        showMoreBtn.classList.remove('d-none');
+
+                        // Scroll back to start of description
+                        descriptionContent.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    });
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add to your existing DOMContentLoaded code
+            initDescriptionToggle();
+
+            // Your existing code continues below...
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const ratingStars = document.querySelectorAll('.rating-star');
@@ -332,7 +421,7 @@
                     if (existingIndicator) {
                         ratingMessage.removeChild(existingIndicator);
                     }
-                    
+
                     // Create a loading indicator
                     const loadingIndicator = document.createElement('div');
                     loadingIndicator.className = 'rating-loading';

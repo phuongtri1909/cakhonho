@@ -44,6 +44,18 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
+
+                                    <div class="form-group">
+                                        <label for="about_us" class="form-control-label">Nội dung footer</label>
+                                        <textarea class="form-control @error('about_us') is-invalid @enderror" 
+                                                  name="about_us" id="about_us" rows="6">{{ old('about_us', $donate->about_us ?? '') }}</textarea>
+                                        <small class="form-text text-muted">
+                                            Bạn có thể sử dụng định dạng HTML cơ bản.
+                                        </small>
+                                        @error('about_us')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
                                 </div>
                             </div>
                         </div>

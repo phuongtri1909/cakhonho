@@ -29,6 +29,15 @@ class DonateController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'image_qr' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'about_us' => 'nullable|string',
+        ],[
+            'image_qr.image' => 'Hình ảnh phải là định dạng ảnh',
+            'image_qr.mimes' => 'Hình ảnh phải là định dạng jpeg, png, jpg hoặc gif',
+            'image_qr.max' => 'Hình ảnh không được lớn hơn 2MB',
+            'title.required' => 'Tiêu đề không được để trống',
+            'title.max' => 'Tiêu đề không được vượt quá 255 ký tự',
+            'description.string' => 'Mô tả phải là chuỗi ký tự',
+            'about_us.string' => 'Về chúng tôi phải là chuỗi ký tự',
         ]);
         
         // Get existing record or create new
@@ -40,6 +49,7 @@ class DonateController extends Controller
         // Update text fields
         $donate->title = $validatedData['title'];
         $donate->description = $validatedData['description'];
+        $donate->about_us = $validatedData['about_us'];
         
         // Handle QR code image upload
         if ($request->hasFile('image_qr')) {

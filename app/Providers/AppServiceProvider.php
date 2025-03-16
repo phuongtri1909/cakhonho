@@ -10,6 +10,8 @@ use App\Models\Status;
 use App\Models\Chapter;
 use App\Models\Socials;
 use App\Models\Category;
+use App\Models\Story;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Schema;
@@ -57,7 +59,7 @@ class AppServiceProvider extends ServiceProvider
                 ->join('category_story', 'categories.id', '=', 'category_story.category_id')
                 ->join('stories', 'category_story.story_id', '=', 'stories.id')
                 ->join('chapters', 'stories.id', '=', 'chapters.story_id')
-                ->leftJoin('ratings', 'stories.id', '=', 'ratings.story_id') // Changed to leftJoin to include stories with no ratings
+                ->leftJoin('ratings', 'stories.id', '=', 'ratings.story_id')
                 ->groupBy([
                     'categories.id',
                     'categories.name',
@@ -69,6 +71,76 @@ class AppServiceProvider extends ServiceProvider
                 ->get();
                 
             $view->with('topCategories', $topCategories);
+            
+            // Get top 10 hot stories for today
+            $dailyHotStories = Story::select([
+                'stories.id',
+                'stories.title',
+                'stories.slug',
+                'stories.description',
+                'stories.cover',
+                DB::raw('COUNT(chapters.id) as chapters_count'),
+                DB::raw('SUM(chapters.views) as total_views'),
+                DB::raw('AVG(daily_ratings.rating) as daily_rating'),
+                DB::raw('(SUM(chapters.views) * AVG(COALESCE(daily_ratings.rating, 3))) as hotness_score')
+            ])
+            ->with(['latestChapter'])
+            ->join('chapters', 'stories.id', '=', 'chapters.story_id')
+            ->leftJoin(DB::raw('(SELECT story_id, rating FROM ratings WHERE DATE(created_at) = CURRENT_DATE()) as daily_ratings'), 
+                'stories.id', '=', 'daily_ratings.story_id')
+            ->where('stories.status', 'published')
+            ->groupBy('stories.id', 'stories.title', 'stories.slug', 'stories.description', 'stories.cover')
+            ->orderByDesc('hotness_score')
+            ->take(10)
+            ->get();
+            
+            // Get top 10 hot stories for this week
+            $weeklyHotStories = Story::select([
+                'stories.id',
+                'stories.title',
+                'stories.slug',
+                'stories.description',
+                'stories.cover',
+                DB::raw('COUNT(chapters.id) as chapters_count'),
+                DB::raw('SUM(chapters.views) as total_views'),
+                DB::raw('AVG(weekly_ratings.rating) as weekly_rating'),
+                DB::raw('(SUM(chapters.views) * AVG(COALESCE(weekly_ratings.rating, 3))) as hotness_score')
+            ])
+            ->with(['latestChapter'])
+            ->join('chapters', 'stories.id', '=', 'chapters.story_id')
+            ->leftJoin(DB::raw('(SELECT story_id, rating FROM ratings WHERE created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)) as weekly_ratings'), 
+                'stories.id', '=', 'weekly_ratings.story_id')
+            ->where('stories.status', 'published')
+            ->groupBy('stories.id', 'stories.title', 'stories.slug', 'stories.description', 'stories.cover')
+            ->orderByDesc('hotness_score')
+            ->take(10)
+            ->get();
+            
+            // Get top 10 hot stories for this month
+            $monthlyHotStories = Story::select([
+                'stories.id',
+                'stories.title',
+                'stories.slug',
+                'stories.description',
+                'stories.cover',
+                DB::raw('COUNT(chapters.id) as chapters_count'),
+                DB::raw('SUM(chapters.views) as total_views'),
+                DB::raw('AVG(monthly_ratings.rating) as monthly_rating'),
+                DB::raw('(SUM(chapters.views) * AVG(COALESCE(monthly_ratings.rating, 3))) as hotness_score')
+            ])
+            ->with(['latestChapter'])
+            ->join('chapters', 'stories.id', '=', 'chapters.story_id')
+            ->leftJoin(DB::raw('(SELECT story_id, rating FROM ratings WHERE created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)) as monthly_ratings'), 
+                'stories.id', '=', 'monthly_ratings.story_id')
+            ->where('stories.status', 'published')
+            ->groupBy('stories.id', 'stories.title', 'stories.slug', 'stories.description', 'stories.cover')
+            ->orderByDesc('hotness_score')
+            ->take(10)
+            ->get();
+
+            $view->with('dailyHotStories', $dailyHotStories);
+            $view->with('weeklyHotStories', $weeklyHotStories);
+            $view->with('monthlyHotStories', $monthlyHotStories);
 
             $donate = Donate::first() ?? new Donate();
             $view->with('donate', $donate);

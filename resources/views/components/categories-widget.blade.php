@@ -1,7 +1,7 @@
 <!-- filepath: /d:/full_truyen/resources/views/components/categories-widget.blade.php -->
 <div class="sidebar-widget categories-widget rounded-4 shadow-sm">
     <div class="widget-header mb-3">
-        <h3 class="widget-title h5">
+        <h3 class="fs-5 m-0 text-dark">
             <i class="fas fa-tags text-primary me-2"></i>
             @if ($isSearch)
                 Thể Loại
@@ -22,7 +22,7 @@
         <div class="category-grid">
             @foreach ($categories as $category)
                 <a href="{{ route('categories.story.show', $category->slug) }}" 
-                   class="category-item {{ isset($currentCategory) && $currentCategory->id == $category->id ? 'active' : '' }}">
+                   class="category-item rounded-4 {{ isset($currentCategory) && $currentCategory->id == $category->id ? 'active' : '' }}">
                     <span class="category-name">{{ $category->name }}</span>
                     {{-- <span class="story-count badge bg-secondary">{{ $category->stories_count }}</span> --}}
                 </a>

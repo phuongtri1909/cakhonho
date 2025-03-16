@@ -11,7 +11,7 @@
 <section id="all-chapter" class="mt-5">
     <div class="container">
         <div class="section-title d-flex align-items-baseline ">
-            <i class="fa-solid fa-book-open fa-xl text-danger"></i>
+            <i class="fa-solid fa-book-open fa-xl cl-8ed7ff"></i>
             <h5 class="fw-bold ms-2">DANH SÁCH CHƯƠNG</h5>
 
         </div>

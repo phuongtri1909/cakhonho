@@ -1,6 +1,6 @@
 <div class="finished-stories mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="finished-title">
+        <h2 class="fs-5 m-0 text-dark">
             <i class="fas fa-check-circle text-success me-2 fa-xl"></i>
             Truyện Đã Hoàn Thành
         </h2>
@@ -25,7 +25,7 @@
                             </a>
                         </h3>
                         <div class="finished-chapters">
-                            <i class="fas fa-book-open text-danger"></i>
+                            <i class="fas fa-book-open cl-8ed7ff"></i>
                             <span class="fw-bold">{{ $story->chapters_count }} Chương</span>
                         </div>
                     </div>
@@ -91,7 +91,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: scale-down;
         transition: transform 0.3s ease;
     }
 
