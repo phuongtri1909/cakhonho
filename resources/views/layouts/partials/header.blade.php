@@ -6,6 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
+    @php
+        // Get the logo and favicon from LogoSite model
+        $logoSite = \App\Models\LogoSite::first();
+        $logoPath = $logoSite && $logoSite->logo ? Storage::url($logoSite->logo) : asset('assets/images/logo/logo_site.webp');
+        $faviconPath = $logoSite && $logoSite->favicon ? Storage::url($logoSite->favicon) : asset('assets/images/logo/favicon.ico');
+    @endphp
+
     <title>@yield('title', 'Trang chủ - Web đọc truyện online miễn phí | ' . config('app.name'))</title>
     <meta name="description" content="@yield('description', 'Phùng Bảo Ngọc
                         Nơi đây là thế giới của những câu chuyện ngôn tình mang chiều sâu có H văn. Những câu chuyện về những cặp đôi lạc lối trong chính trái tim mình, loay hoay giữa yêu thương và dằn vặt, để rồi sau tất cả, họ nhận ra tình yêu thật sự luôn tồn tại trong chính họ. Nếu bạn cũng thích những mối quan hệ loay hoay trong bản ngã để rồi thức tỉnh rằng tình yêu vẫn luôn ở sâu trong tâm khảm linh hồn- chào mừng bạn đã đến đây.')">
@@ -18,8 +25,8 @@
     <meta property="og:url" content="{{ url()->full() }}">
     <meta property="og:site_name" content="{{ config('app.name') }}">
     <meta property="og:locale" content="vi_VN">
-    <meta property="og:image" content="{{ asset('assets/images/logo/logo_site.webp') }}">
-    <meta property="og:image:secure_url" content="{{ asset('assets/images/logo/logo_site.webp') }}">
+    <meta property="og:image" content="{{ $logoPath }}">
+    <meta property="og:image:secure_url" content="{{ $logoPath }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="@yield('title', 'Trang chủ - Web đọc truyện online miễn phí | ' . config('app.name'))')">
@@ -27,11 +34,11 @@
     <meta name="twitter:title" content="@yield('title', 'Trang chủ - Web đọc truyện online miễn phí | ' . config('app.name'))')">
     <meta name="twitter:description" content="@yield('description', 'Phùng Bảo Ngọc
                         Nơi đây là thế giới của những câu chuyện ngôn tình mang chiều sâu có H văn. Những câu chuyện về những cặp đôi lạc lối trong chính trái tim mình, loay hoay giữa yêu thương và dằn vặt, để rồi sau tất cả, họ nhận ra tình yêu thật sự luôn tồn tại trong chính họ. Nếu bạn cũng thích những mối quan hệ loay hoay trong bản ngã để rồi thức tỉnh rằng tình yêu vẫn luôn ở sâu trong tâm khảm linh hồn- chào mừng bạn đã đến đây.')">
-    <meta name="twitter:image" content="{{ asset('assets/images/logo/logo_site.webp') }}">
+    <meta name="twitter:image" content="{{ $logoPath }}">
     <meta name="twitter:image:alt" content="@yield('title', 'Trang chủ - Web đọc truyện online miễn phí | ' . config('app.name'))">
-    <link rel="icon" href="{{ asset('assets/images/logo/favicon.ico') }}" type="image/png/x-icon">
+    <link rel="icon" href="{{ $faviconPath }}" type="image/x-icon">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="shortcut icon" href="{{ asset('assets/images/logo/favicon.ico') }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ $faviconPath }}" type="image/x-icon">
     <meta name="google-site-verification" content="" />
 
     <script type="application/ld+json">
@@ -39,7 +46,7 @@
           "@context": "https://schema.org",
           "@type": "Organization",
           "url": "{{ url('/') }}",
-          "logo": "{{ asset('assets/images/logo/logo_site.webp')}}"
+          "logo": "{{ $logoPath }}"
         }
     </script>
 
@@ -67,13 +74,18 @@
                 <div class="d-flex align-items-center w-100">
                     <!-- Logo -->
                     <a class="navbar-brand p-0" href="{{ route('home') }}">
-                        <img height="50" src="{{ asset('assets/images/logo/logo_site.webp') }}" alt="logo">
+                        <img height="50" src="{{ $logoPath }}" alt="{{ config('app.name') }} logo">
                     </a>
 
                     <div class="d-flex align-items-center w-100 justify-content-between flex-lg-row">
                         <!-- Desktop Menu - Visible on lg screens and up -->
                         <div class="list-menu d-none d-lg-block">
                             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                    <a class="text-dark nav-link" href="{{ route('home') }}">
+                                        <i class="fa-solid fa-home fa-lg"></i> Trang chủ
+                                    </a>
+                                </li>
                                 <li class="nav-item dropdown">
                                     <a class="text-dark nav-link dropdown-toggle" href="#" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
@@ -97,12 +109,6 @@
                                             @endforeach
                                         </div>
                                     </ul>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="text-dark nav-link" href="{{ route('contact') }}">
-                                        <i class="fa-solid fa-address-card fa-lg"></i> Liên hệ
-                                    </a>
                                 </li>
                             </ul>
                         </div>
@@ -184,7 +190,7 @@
             <div class="offcanvas-header">
 
                 <a class="navbar-brand" href="{{ route('home') }}">
-                    <img height="50" src="{{ asset('assets/images/logo/logo_site.webp') }}" alt="logo">
+                    <img height="50" src="{{ $logoPath }}" alt="{{ config('app.name') }} logo">
                 </a>
 
                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
@@ -193,6 +199,12 @@
                 <!-- Navigation Links -->
                 <div class="mobile-section">
                     <div class="mobile-nav-links d-flex flex-column">
+
+                        <a href="{{ route('home') }}" class="mobile-menu-item ">
+                            <i class="fa-solid fa-address-card fa-lg me-2"></i> Trang chủ
+                        </a>
+
+                        <hr class="divider my-3">
 
                         <div class="accordion" id="categoryAccordion">
                             <div class="accordion-item border-0">
@@ -224,11 +236,7 @@
 
                         <hr class="divider my-3">
 
-                        <a href="{{ route('contact') }}" class="mobile-menu-item ">
-                            <i class="fa-solid fa-address-card fa-lg me-2"></i> Liên hệ
-                        </a>
-
-                        <hr class="divider my-3">
+                        
 
 
                         @auth
@@ -317,3 +325,5 @@
             });
         });
     </script>
+</body>
+</html>

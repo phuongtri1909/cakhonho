@@ -350,6 +350,10 @@ body {
     margin-top: 80px;
 }
 
+.mt-68 {
+    margin-top: 68px;
+}
+
 .mt-50 {
     margin-top: 50px;
 }
@@ -812,7 +816,6 @@ body {
 @media (max-width: 991.98px) {
     .search-container {
         max-width: 100%;
-        margin: 10px 0;
     }
 }
 

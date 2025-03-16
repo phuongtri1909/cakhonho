@@ -165,9 +165,6 @@
         .finished-title {
             font-size: 1.25rem;
         }
-        .col-md-4 {
-            width: 33.333333%;
-        }
     }
 
     @media (max-width: 767.98px) {

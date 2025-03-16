@@ -8,6 +8,8 @@ use App\Http\Controllers\BankController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StoryController;
+use App\Http\Controllers\BannerController;
+use App\Http\Controllers\DonateController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\ChapterController;
@@ -16,6 +18,7 @@ use App\Http\Controllers\ReadingController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SocialsController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\LogoSiteController;
 use App\Http\Controllers\RecentlyReadController;
 use App\Http\Controllers\CommentReactionController;
 
@@ -44,10 +47,6 @@ Route::group(['middleware' => 'check.ip.ban'], function () {
         Route::get('stories/{story}/chapters/{chapter}', [HomeController::class, 'chapter'])->name('chapter');
 
         Route::get('/search', [HomeController::class,'searchHeader'])->name('searchHeader');
-
-        Route::get('/contact', function () {
-            return view('pages.contact');
-        })->name('contact');
 
         // Route for viewing stories by category
         Route::get('/categories-story/{slug}', [HomeController::class,'showStoryCategories'])->name('categories.story.show');
@@ -110,6 +109,14 @@ Route::group(['middleware' => 'check.ip.ban'], function () {
                     Route::delete('comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
                     Route::delete('delete-comments/{comment}', [CommentController::class, 'deleteComment'])->name('delete.comments');
+                
+                    Route::resource('banners', BannerController::class);
+
+                    Route::get('logo-site', [LogoSiteController::class, 'edit'])->name('logo-site.edit');
+                    Route::put('logo-site', [LogoSiteController::class, 'update'])->name('logo-site.update');
+
+                    Route::get('/admin/donate', [DonateController::class, 'edit'])->name('donate.edit');
+                    Route::put('/admin/donate', [DonateController::class, 'update'])->name('donate.update');
                 });
             });
         });

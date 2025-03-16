@@ -3,15 +3,16 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Models\Donate;
+use App\Models\Rating;
 use App\Models\Social;
 use App\Models\Status;
 use App\Models\Chapter;
 use App\Models\Socials;
 use App\Models\Category;
-use App\Models\Rating;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -68,6 +69,9 @@ class AppServiceProvider extends ServiceProvider
                 ->get();
                 
             $view->with('topCategories', $topCategories);
+
+            $donate = Donate::first() ?? new Donate();
+            $view->with('donate', $donate);
         });
     }
 }

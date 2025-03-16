@@ -3,9 +3,13 @@
     <div class="sidenav-header">
         <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
             aria-hidden="true" id="iconSidenav"></i>
+        @php
+            // Get the logo from LogoSite model
+            $logoSite = \App\Models\LogoSite::first();
+            $logoPath = $logoSite && $logoSite->logo ? Storage::url($logoSite->logo) : asset('assets/images/logo/logo_site.webp');
+        @endphp
         <a class="d-flex m-0 justify-content-center text-wrap" href="{{ route('home') }}">
-            <img height="50" class="logo_conduongbachu" src="{{ asset('assets/images/logo/logo_site.webp') }}"
-                alt="logo_conduongbachu">
+            <img height="70" class="logo_site" src="{{ $logoPath }}" alt="{{ config('app.name') }} logo">
         </a>
     </div>
     <hr class="horizontal dark mt-0">
@@ -67,6 +71,39 @@
                         <i class="fa-solid fa-layer-group text-dark icon-sidebar"></i>
                     </div>
                     <span class="nav-link-text ms-1">Danh sách truyện</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ Route::currentRouteNamed('banners.*') ? 'active' : '' }}"
+                    href="{{ route('banners.index') }}">
+                    <div
+                        class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fa-regular fa-image text-dark icon-sidebar"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Banners</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ Route::currentRouteNamed('logo-site.*') ? 'active' : '' }}"
+                    href="{{ route('logo-site.edit') }}">
+                    <div
+                        class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fa-regular fa-images text-dark icon-sidebar"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Logo</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ Route::currentRouteNamed('donate.*') ? 'active' : '' }}"
+                    href="{{ route('donate.edit') }}">
+                    <div
+                        class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fa-solid fa-hand-holding-heart text-dark icon-sidebar"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Cấu hình Donate</span>
                 </a>
             </li>
 

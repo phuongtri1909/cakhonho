@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Story;
+use App\Models\Banner;
 use App\Models\Rating;
 use App\Models\Status;
 use App\Models\Chapter;
@@ -11,8 +12,8 @@ use App\Models\Comment;
 use App\Models\Socials;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use App\Services\ReadingHistoryService;
 use Illuminate\Support\Facades\Log;
+use App\Services\ReadingHistoryService;
 
 class HomeController extends Controller
 {
@@ -62,6 +63,10 @@ class HomeController extends Controller
 
     public function index(Request $request)
     {
+
+        // Get banners
+        $banners = Banner::active()->get();
+
         // Get hot stories
         $hotStories = $this->getHotStories($request);
 
@@ -105,7 +110,7 @@ class HomeController extends Controller
             }
         }
 
-        return view('pages.home', compact('hotStories', 'newStories', 'completedStories'));
+        return view('pages.home', compact('hotStories', 'newStories', 'completedStories', 'banners'));
     }
 
     private function getHotStories($request)
