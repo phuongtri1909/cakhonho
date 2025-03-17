@@ -30,7 +30,7 @@
                                 <div class="col-md-6">
                                     <div class="banner-content">
                                         @if ($banner->story)
-                                            <h2 class="banner-title">{{ $banner->story->title }}</h2>
+                                            <h2 class="banner-title fs-2">{{ $banner->story->title }}</h2>
                                             <div class="banner-meta">
                                                 @foreach($banner->story->categories as $category)
                                                     <a class="category-tag text-decoration-none" href="{{ route('categories.show', $category) }}">
