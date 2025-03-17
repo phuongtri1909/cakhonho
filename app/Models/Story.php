@@ -20,6 +20,12 @@ class Story extends Model
         'completed',
     ];
 
+
+    public function banners()
+    {
+        return $this->hasMany(Banner::class);
+    }
+
     public function ratings()
     {
         return $this->hasMany(Rating::class);

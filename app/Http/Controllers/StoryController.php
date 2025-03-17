@@ -282,8 +282,15 @@ class StoryController extends Controller
         DB::beginTransaction();
 
         try {
+            // Delete related banners first
+            $story->banners()->delete();
+
+            // Now delete other relationships
             $story->categories()->detach();
+
+            // Finally delete the story
             $story->delete();
+
             DB::commit();
 
             Storage::disk('public')->delete([
