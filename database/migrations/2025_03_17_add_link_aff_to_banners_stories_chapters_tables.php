@@ -12,15 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('banners', function (Blueprint $table) {
-            $table->string('link_aff')->nullable()->after('link');
+            $table->text('link_aff')->nullable()->after('link');
         });
         
         Schema::table('stories', function (Blueprint $table) {
-            $table->string('link_aff')->nullable()->after('slug');
+            $table->text('link_aff')->nullable()->after('slug');
         });
         
         Schema::table('chapters', function (Blueprint $table) {
-            $table->string('link_aff')->nullable()->after('slug');
+            $table->text('link_aff')->nullable()->after('slug');
         });
     }
 
