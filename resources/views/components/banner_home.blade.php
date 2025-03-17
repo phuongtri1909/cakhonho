@@ -8,6 +8,7 @@
         <div class="swiper-wrapper">
             @foreach ($banners as $banner)
                 <div class="swiper-slide">
+                    <a href="{{ route('banner.click',$banner) }}" class="stretched-link"></a>
                     @php
                         // Generate the correct image path based on device
                         $imagePath = '';
@@ -151,7 +152,7 @@
                 loop: true,
                 effect: 'fade',
                 autoplay: {
-                    delay: 2000,
+                    delay: 3000,
                 },
 
                 // Navigation arrows

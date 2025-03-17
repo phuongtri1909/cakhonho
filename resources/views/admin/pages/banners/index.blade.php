@@ -24,6 +24,7 @@
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Hình ảnh</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Liên kết tới</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Link aff</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Trạng thái</th>
                                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Hành động</th>
                                 </tr>
@@ -45,6 +46,11 @@
                                                     <a href="{{ $banner->link }}" target="_blank">{{ $banner->link }}</a>
                                                 </p>
                                             @endif
+                                        </td>
+                                        <td>
+                                            <p class="text-xs font-weight-bold mb-0">
+                                                <a href="{{ $banner->link_aff }}" target="_blank"> {{ Str::limit($banner->link_aff, 20) }}</a>
+                                            </p>
                                         </td>
                                         <td>
                                             <span class="badge badge-sm {{ $banner->status ? 'bg-gradient-success' : 'bg-gradient-secondary' }}">

@@ -19,6 +19,7 @@ class Chapter extends Model
         'status',
         'story_id',
         'user_id',
+        'link_aff',
     ];
 
     public function user()

@@ -72,6 +72,10 @@
                                     </th>
 
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Link aff
+                                    </th>
+
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                         Trạng thái
                                     </th>
 
@@ -104,6 +108,13 @@
                                         <td>
                                             <p class="text-xs font-weight-bold mb-0">{{ $chapter->views ?? 0 }}</p>
                                         </td>
+
+                                        <td>
+                                            <p class="text-xs font-weight-bold mb-0">
+                                                <a href="{{ $chapter->link_aff }}" target="_blank"> {{ Str::limit($chapter->link_aff, 20) }}</a>
+                                            </p>
+                                        </td>
+
                                         <td>
                                             <span
                                                 class="badge badge-sm bg-gradient-{{ $chapter->status === 'published' ? 'success' : 'warning' }}">

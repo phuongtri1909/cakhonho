@@ -68,6 +68,18 @@
 
                         <div class="col-md-12">
                             <div class="form-group">
+                                <label for="link_aff" class="form-label">Link Affiliate</label>
+                                <input type="url" class="form-control" id="link_aff" name="link_aff"
+                                    value="{{ old('link_aff', $banner->link_aff ?? '') }}"
+                                    placeholder="Nhập link affiliate (Shopee, TikTok...)">
+                                @error('link_aff')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
                                 <label for="status">Trạng thái</label>
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" name="status" id="status" value="1"

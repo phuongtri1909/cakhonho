@@ -81,6 +81,7 @@ class ChapterController extends Controller
                 'integer',
             ],
             'status' => 'required|in:draft,published',
+            'link_aff' => 'nullable|url',
         ], [
             'title.required' => 'Tên chương không được để trống',
             'content.required' => 'Nội dung chương không được để trống',
@@ -88,6 +89,7 @@ class ChapterController extends Controller
             'number.integer' => 'Số chương phải là số nguyên',
             'status.required' => 'Trạng thái chương không được để trống',
             'status.in' => 'Trạng thái chương không hợp lệ',
+            'link_aff.url' => 'Link liên kết không hợp lệ',
         ]);
 
         try {
@@ -99,6 +101,7 @@ class ChapterController extends Controller
                 'status' => $request->status,
                 'user_id' => auth()->id(),
                 'updated_content_at' => now(),
+                'link_aff' => $request->link_aff,
             ]);
 
             return redirect()->route('stories.chapters.index', $story)
@@ -134,6 +137,15 @@ class ChapterController extends Controller
                 'integer',
             ],
             'status' => 'required|in:draft,published',
+            'link_aff' => 'nullable|url',
+        ],[
+            'title.required' => 'Tên chương không được để trống',
+            'content.required' => 'Nội dung chương không được để trống',
+            'number.required' => 'Số chương không được để trống',
+            'number.integer' => 'Số chương phải là số nguyên',
+            'status.required' => 'Trạng thái chương không được để trống',
+            'status.in' => 'Trạng thái chương không hợp lệ',
+            'link_aff.url' => 'Link liên kết không hợp lệ',
         ]);
 
         try {
@@ -144,6 +156,7 @@ class ChapterController extends Controller
                 'number' => $request->number,
                 'status' => $request->status,
                 'updated_content_at' => now(),
+                'link_aff' => $request->link_aff,
             ]);
 
             return redirect()->route('stories.chapters.index', $story)

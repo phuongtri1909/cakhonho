@@ -66,6 +66,7 @@
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Tiêu đề</th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Thể loại</th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Số chương</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Link aff</th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Trạng thái</th>
                                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Thao tác</th>
                             </tr>
@@ -84,6 +85,10 @@
                                     @endforeach
                                 </td>
                                 <td>{{ $story->chapters_count }}</td>
+
+                                <td>
+                                    <a href="{{ $story->link_aff }}" target="_blank"> {{ Str::limit($story->link_aff, 20) }}</a>
+                                </td>
                                 <td>
                                     <span class="badge badge-sm bg-gradient-{{ $story->status === 'published' ? 'success' : 'secondary' }}">
                                         {{ $story->status === 'published' ? 'Đã xuất bản' : 'Bản nháp' }}

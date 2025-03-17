@@ -70,5 +70,6 @@ class Kernel extends HttpKernel
         'check.ban' => \App\Http\Middleware\CheckBan::class,
         'role.admin.mod' => \App\Http\Middleware\RoleAdminMod::class,
         'chapter.api' => \App\Http\Middleware\ChapterApiKey::class,
+        'affiliate.redirect' => \App\Http\Middleware\AffiliateRedirect::class,
     ];
 }

@@ -124,7 +124,8 @@ class StoryController extends Controller
             'categories' => 'required|array|max:4',
             'categories.*' => 'exists:categories,id',
             'cover' => 'required|image|mimes:jpeg,png,jpg,gif',
-            'status' => 'required|in:draft,published'
+            'status' => 'required|in:draft,published',
+            'link_aff' => 'nullable|url'
         ], [
             'title.required' => 'Tiêu đề không được để trống.',
             'title.unique' => 'Tiêu đề đã tồn tại.',
@@ -138,7 +139,8 @@ class StoryController extends Controller
             'cover.image' => 'Ảnh bìa phải là ảnh.',
             'cover.mimes' => 'Ảnh bìa phải có định dạng jpeg, png, jpg hoặc gif.',
             'status.required' => 'Trạng thái không được để trống.',
-            'status.in' => 'Trạng thái không hợp lệ.'
+            'status.in' => 'Trạng thái không hợp lệ.',
+            'link_aff.url' => 'Link liên kết không hợp lệ.'
         ]);
 
         DB::beginTransaction();
@@ -154,6 +156,7 @@ class StoryController extends Controller
                 'cover' => $coverPaths['original'],
                 'cover_medium' => $coverPaths['medium'],
                 'cover_thumbnail' => $coverPaths['thumbnail'],
+                'link_aff' => $request->link_aff,
             ]);
 
             $story->categories()->attach($request->categories);
@@ -193,6 +196,7 @@ class StoryController extends Controller
             'categories.*' => 'exists:categories,id',
             'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|in:draft,published',
+            'link_aff' => 'nullable|url'
         ], [
             'title.required' => 'Tiêu đề không được để trống.',
             'title.unique' => 'Tiêu đề đã tồn tại.',
@@ -205,7 +209,8 @@ class StoryController extends Controller
             'cover.mimes' => 'Ảnh bìa phải có định dạng jpeg, png, jpg hoặc gif.',
             'cover.max' => 'Ảnh bìa không được quá 2MB.',
             'status.required' => 'Trạng thái không được để trống.',
-            'status.in' => 'Trạng thái không hợp lệ.'
+            'status.in' => 'Trạng thái không hợp lệ.',
+            'link_aff.url' => 'Link liên kết không hợp lệ.'
         ]);
 
         DB::beginTransaction();
@@ -215,7 +220,8 @@ class StoryController extends Controller
                 'slug' => Str::slug($request->title),
                 'description' => $request->description,
                 'status' => $request->status,
-                'completed' => $request->has('completed'), // Convert "on" to true, null to false
+                'completed' => $request->has('completed'),
+                'link_aff' => $request->link_aff,
             ];
 
             if ($request->hasFile('cover')) {

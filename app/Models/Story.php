@@ -18,6 +18,7 @@ class Story extends Model
         'cover_medium',
         'cover_thumbnail',
         'completed',
+        'link_aff',
     ];
 
 

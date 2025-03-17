@@ -14,6 +14,7 @@ class Banner extends Model
         'link',
         'story_id',
         'status',
+        'link_aff',
     ];
 
     public function story()

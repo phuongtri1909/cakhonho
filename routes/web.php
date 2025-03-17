@@ -42,17 +42,19 @@ Route::get('/sitemap-categories.xml', [SitemapController::class, 'categories'])-
 Route::group(['middleware' => 'check.ip.ban'], function () {
     Route::middleware(['check.ban:ban_login'])->group(function () {
         Route::get('/', [HomeController::class, 'index'])->name('home');
-        Route::get('story/{slug}', [HomeController::class, 'showStory'])->name('show.page.story');
-        Route::get('stories/{story}/chapters', [HomeController::class, 'chapters'])->name('chapters');
-        Route::get('stories/{story}/chapters/{chapter}', [HomeController::class, 'chapter'])->name('chapter');
-
         Route::get('/search', [HomeController::class,'searchHeader'])->name('searchHeader');
 
         // Route for viewing stories by category
         Route::get('/categories-story/{slug}', [HomeController::class,'showStoryCategories'])->name('categories.story.show');
 
+        Route::get('story/{slug}', [HomeController::class, 'showStory'])->middleware('affiliate.redirect:story')->name('show.page.story');
+
+        Route::get('/banner/{banner}', [BannerController::class, 'click'])
+        ->middleware('affiliate.redirect:banner')
+        ->name('banner.click');
+
         Route::middleware(['check.ban:ban_read'])->group(function () {
-            Route::get('/story/{storySlug}/{chapterSlug}', [HomeController::class, 'chapterByStory'])->name('chapter');
+            Route::get('/story/{storySlug}/{chapterSlug}', [HomeController::class, 'chapterByStory'])->middleware('affiliate.redirect:chapter')->name('chapter');
             Route::get('/search-chapters', [HomeController::class, 'searchChapters'])->name('chapters.search');
             Route::post('/reading/save-progress', [ReadingController::class, 'saveProgress'])
                 ->name('reading.save-progress');

@@ -10,6 +10,33 @@ use Intervention\Image\Facades\Image;
 
 class BannerController extends Controller
 {
+
+
+
+    /**
+     * Handle banner click and redirect
+     */
+    public function click(Request $request, Banner $banner)
+    {
+        // Check if banner has a story
+        if ($banner->story_id) {
+            // If banner has a story, redirect to story page
+            $story = Story::find($banner->story_id);
+            if ($story) {
+                return redirect()->route('show.page.story', $story->slug);
+            }
+        }
+
+        // If no story or story not found, use the banner link
+        if (!empty($banner->link)) {
+            // Direct redirect to external link
+            return redirect()->away($banner->link);
+        }
+
+        // Fallback to homepage if neither exists
+        return redirect()->route('home');
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -34,19 +61,19 @@ class BannerController extends Controller
     public function store(Request $request)
     {
         $validatedData = $this->validateBanner($request);
-        
+
         // Handle image upload
         if ($request->hasFile('image')) {
             $validatedData['image'] = $this->processImage($request->file('image'));
         }
-        
+
         // Handle link requirement based on story_id
         if (empty($validatedData['story_id']) && empty($validatedData['link'])) {
             return back()->withInput()->withErrors(['link' => 'Link là bắt buộc khi không chọn truyện']);
         }
-        
+
         Banner::create($validatedData);
-        
+
         return redirect()->route('banners.index')->with('success', 'Banner đã được tạo thành công');
     }
 
@@ -73,24 +100,24 @@ class BannerController extends Controller
     public function update(Request $request, Banner $banner)
     {
         $validatedData = $this->validateBanner($request, $banner->id);
-        
+
         // Handle image upload
         if ($request->hasFile('image')) {
             // Delete old image
             if ($banner->image) {
                 Storage::delete('public/' . $banner->image);
             }
-            
+
             $validatedData['image'] = $this->processImage($request->file('image'));
         }
-        
+
         // Handle link requirement based on story_id
         if (empty($validatedData['story_id']) && empty($validatedData['link'])) {
             return back()->withInput()->withErrors(['link' => 'Link là bắt buộc khi không chọn truyện']);
         }
-        
+
         $banner->update($validatedData);
-        
+
         return redirect()->route('banners.index')->with('success', 'Banner đã được cập nhật thành công');
     }
 
@@ -103,12 +130,12 @@ class BannerController extends Controller
         if ($banner->image) {
             Storage::delete('public/' . $banner->image);
         }
-        
+
         $banner->delete();
-        
+
         return redirect()->route('banners.index')->with('success', 'Banner đã được xóa thành công');
     }
-    
+
     /**
      * Validate banner data
      */
@@ -119,11 +146,12 @@ class BannerController extends Controller
             'link' => 'nullable|url|max:255',
             'story_id' => 'nullable|exists:stories,id',
             'status' => 'required|boolean',
+            'link_aff' => 'nullable|url',
         ];
-        
+
         return $request->validate($rules);
     }
-    
+
     /**
      * Process and optimize the uploaded image
      */
@@ -131,7 +159,7 @@ class BannerController extends Controller
     {
         $filename = uniqid() . '_' . time() . '.' . $image->getClientOriginalExtension();
         $path = 'banners/' . $filename;
-        
+
         // Desktop version (original size)
         $desktopImg = Image::make($image->getRealPath())
             ->resize(1920, null, function ($constraint) {
@@ -139,9 +167,9 @@ class BannerController extends Controller
                 $constraint->upsize();
             })
             ->encode('webp', 80); // 80% quality
-            
+
         Storage::put('public/banners/desktop_' . $filename, $desktopImg);
-        
+
         // Mobile version
         $mobileImg = Image::make($image->getRealPath())
             ->resize(767, null, function ($constraint) {
@@ -149,15 +177,15 @@ class BannerController extends Controller
                 $constraint->upsize();
             })
             ->encode('webp', 70); // 70% quality
-            
+
         Storage::put('public/banners/mobile_' . $filename, $mobileImg);
-        
+
         // Save original with reduced quality
         $mainImg = Image::make($image->getRealPath())
             ->encode('webp', 90); // 90% quality
-            
+
         Storage::put('public/' . $path, $mainImg);
-        
+
         return $path;
     }
 }

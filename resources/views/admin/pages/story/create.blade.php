@@ -63,6 +63,16 @@
                                 </div>
 
                                 <div class="form-group">
+                                    <label for="link_aff" class="form-label">Link Affiliate</label>
+                                    <input type="url" class="form-control" id="link_aff" name="link_aff"
+                                        value="{{ old('link_aff', $story->link_aff ?? '') }}"
+                                        placeholder="Nhập link affiliate (Shopee, TikTok...)">
+                                    @error('link_aff')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group">
                                     <label for="status">Trạng thái</label>
                                     <select name="status" id="status" class="form-control">
                                         <option value="draft">Bản nháp</option>
