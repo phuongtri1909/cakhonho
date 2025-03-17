@@ -19,5 +19,5 @@ Disallow: /comment/store
 Disallow: /ratings
 
 # Sitemaps
-Sitemap: https://hanlamngoc.com/sitemap.xml
+Sitemap: https://cakhonho.com/sitemap.xml
 Crawl-delay: 10

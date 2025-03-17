@@ -13,15 +13,13 @@
         $faviconPath = $logoSite && $logoSite->favicon ? Storage::url($logoSite->favicon) : asset('assets/images/logo/favicon.ico');
     @endphp
 
-    <title>@yield('title', 'Trang chủ - Web đọc truyện online miễn phí | ' . config('app.name'))</title>
-    <meta name="description" content="@yield('description', 'Phùng Bảo Ngọc
-                        Nơi đây là thế giới của những câu chuyện ngôn tình mang chiều sâu có H văn. Những câu chuyện về những cặp đôi lạc lối trong chính trái tim mình, loay hoay giữa yêu thương và dằn vặt, để rồi sau tất cả, họ nhận ra tình yêu thật sự luôn tồn tại trong chính họ. Nếu bạn cũng thích những mối quan hệ loay hoay trong bản ngã để rồi thức tỉnh rằng tình yêu vẫn luôn ở sâu trong tâm khảm linh hồn- chào mừng bạn đã đến đây.')">
-    <meta name="keywords" content="@yield('keywords', 'hanlamngoc, hanlamngoc.com,  đọc truyện online, truyện miễn phí, truyện hot, truyện mới cập nhật, truyện full, truyện hoàn thành, đọc truyện chữ, web đọc truyện, novel, light novel, kho truyện online, truyện hay, truyện tiên hiệp, truyện kiếm hiệp, ngôn tình, đam mỹ, truyện teen, truyện xuyên không')">
+    <title>@yield('title', 'Truyện Cá Khô Nhỏ - Đọc Truyện Online Miễn Phí')</title>
+    <meta name="description" content="@yield('description', 'Truyện Cá Khô Nhỏ - Kho truyện full, truyện tranh, tiểu thuyết online cập nhật nhanh nhất, giao diện thân thiện, dễ đọc.')">
+    <meta name="keywords" content="@yield('keywords', 'truyện hay, đọc truyện online, truyện tranh, tiểu thuyết, truyện full, Truyện Cá Khô Nhỏ')">
     <meta name="robots" content="index, follow">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="@yield('title', 'Trang chủ - Web đọc truyện online miễn phí | ' . config('app.name'))')">
-    <meta property="og:description" content="@yield('description', 'Phùng Bảo Ngọc
-                        Nơi đây là thế giới của những câu chuyện ngôn tình mang chiều sâu có H văn. Những câu chuyện về những cặp đôi lạc lối trong chính trái tim mình, loay hoay giữa yêu thương và dằn vặt, để rồi sau tất cả, họ nhận ra tình yêu thật sự luôn tồn tại trong chính họ. Nếu bạn cũng thích những mối quan hệ loay hoay trong bản ngã để rồi thức tỉnh rằng tình yêu vẫn luôn ở sâu trong tâm khảm linh hồn- chào mừng bạn đã đến đây.')">
+    <meta property="og:title" content="@yield('title', 'Truyện Cá Khô Nhỏ - Đọc Truyện Online Miễn Phí')">
+    <meta property="og:description" content="@yield('description', 'Truyện Cá Khô Nhỏ - Kho truyện full, truyện tranh, tiểu thuyết online cập nhật nhanh nhất, giao diện thân thiện, dễ đọc.')">
     <meta property="og:url" content="{{ url()->full() }}">
     <meta property="og:site_name" content="{{ config('app.name') }}">
     <meta property="og:locale" content="vi_VN">
@@ -29,16 +27,19 @@
     <meta property="og:image:secure_url" content="{{ $logoPath }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="@yield('title', 'Trang chủ - Web đọc truyện online miễn phí | ' . config('app.name'))')">
+    <meta property="og:image:alt" content="@yield('title', 'Truyện Cá Khô Nhỏ - Đọc Truyện Online Miễn Phí')">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('title', 'Trang chủ - Web đọc truyện online miễn phí | ' . config('app.name'))')">
-    <meta name="twitter:description" content="@yield('description', 'Phùng Bảo Ngọc
-                        Nơi đây là thế giới của những câu chuyện ngôn tình mang chiều sâu có H văn. Những câu chuyện về những cặp đôi lạc lối trong chính trái tim mình, loay hoay giữa yêu thương và dằn vặt, để rồi sau tất cả, họ nhận ra tình yêu thật sự luôn tồn tại trong chính họ. Nếu bạn cũng thích những mối quan hệ loay hoay trong bản ngã để rồi thức tỉnh rằng tình yêu vẫn luôn ở sâu trong tâm khảm linh hồn- chào mừng bạn đã đến đây.')">
+    <meta name="twitter:title" content="@yield('title', 'Truyện Cá Khô Nhỏ - Đọc Truyện Online Miễn Phí')">
+    <meta name="twitter:description" content="@yield('description', 'Truyện Cá Khô Nhỏ - Kho truyện full, truyện tranh, tiểu thuyết online cập nhật nhanh nhất, giao diện thân thiện, dễ đọc.')">
     <meta name="twitter:image" content="{{ $logoPath }}">
-    <meta name="twitter:image:alt" content="@yield('title', 'Trang chủ - Web đọc truyện online miễn phí | ' . config('app.name'))">
+    <meta name="twitter:image:alt" content="@yield('title', 'Truyện Cá Khô Nhỏ - Đọc Truyện Online Miễn Phí')">
     <link rel="icon" href="{{ $faviconPath }}" type="image/x-icon">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="shortcut icon" href="{{ $faviconPath }}" type="image/x-icon">
+    <meta name="author" content="Truyện Cá Khô Nhỏ">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="canonical" href="{{ url()->current() }}">
+    
     <meta name="google-site-verification" content="" />
 
     <script type="application/ld+json">

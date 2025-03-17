@@ -5,11 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
+    @php
+        // Get the logo and favicon from LogoSite model
+        $logoSite = \App\Models\LogoSite::first();
+        $faviconPath =
+            $logoSite && $logoSite->favicon
+                ? Storage::url($logoSite->favicon)
+                : asset('assets/images/logo/favicon.ico');
+    @endphp
     <title>@yield('title')</title>
     <meta name="description" content="@yield('description')">
     <meta name="keywords" content="@yield('keywords')">
-    <link rel="shortcut icon" href="{{ asset('assets/images/logo/favicon.ico') }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{$faviconPath }}" type="image/x-icon">
     @stack('meta')
 
     <!-- Google Fonts -->

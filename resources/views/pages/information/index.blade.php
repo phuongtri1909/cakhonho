@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Thông tin cá nhân')
-@section('description', 'Thông tin cá nhân của bạn trên hanlamngoc.com')
-@section('keyword', 'Thông tin cá nhân, thông tin tài khoản, hanlamngoc, hanlamngoc.com')
+@section('description', 'Thông tin cá nhân của bạn trên ' . {{ request()->getHost() }})
+@section('keyword', 'Thông tin cá nhân, thông tin tài khoản, ' . {{ request()->getHost() }})
 @push('styles')
     <style>
         .avatar {

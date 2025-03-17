@@ -132,27 +132,27 @@
                         class="chapter-nav d-flex justify-content-between align-items-center my-4 animate__animated animate__fadeIn">
                         @if ($prevChapter)
                             <a href="{{ route('chapter', ['storySlug' => $story->slug, 'chapterSlug' => $prevChapter->slug]) }}"
-                                class="btn btn-primary btn-lg">
+                                class="btn btn-primary btn-sm">
                                 <i class="fas fa-arrow-left me-1"></i> Chương trước
                             </a>
                         @else
-                            <button disabled class="btn btn-outline-secondary btn-lg">
+                            <button disabled class="btn btn-outline-secondary btn-sm">
                                 <i class="fas fa-chevron-left me-1"></i> Chương trước
                             </button>
                         @endif
 
                         <a href="{{ route('show.page.story', $story->slug) }}"
-                            class="btn btn-outline-primary btn-lg d-none d-md-block">
+                            class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-book me-1"></i> Mục lục
                         </a>
 
                         @if ($nextChapter)
                             <a href="{{ route('chapter', ['storySlug' => $story->slug, 'chapterSlug' => $nextChapter->slug]) }}"
-                                class="btn btn-primary btn-lg">
+                                class="btn btn-primary btn-sm">
                                 Chương tiếp <i class="fas fa-arrow-right ms-1"></i>
                             </a>
                         @else
-                            <button disabled class="btn btn-outline-secondary btn-lg">
+                            <button disabled class="btn btn-outline-secondary btn-sm">
                                 Chương tiếp <i class="fas fa-chevron-right ms-1"></i>
                             </button>
                         @endif
@@ -504,11 +504,6 @@
         }
 
         /* Typography improvements */
-        .chapter-content p {
-            margin-bottom: 1.5em;
-            text-indent: 1.5em;
-        }
-
         /* Progress bar */
         .reading-progress {
             position: sticky;

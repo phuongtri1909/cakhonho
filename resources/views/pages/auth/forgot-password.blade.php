@@ -22,80 +22,67 @@
                 height: 50px;
             }
         }
+        
+        .cursor-pointer {
+            cursor: pointer;
+        }
     </style>
 @endpush
 
 @section('content-main')
-
-    <section class=" p-3 p-md-4 p-xl-5">
+    <div class="auth-container d-flex align-items-center justify-content-center py-5">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-12 col-xxl-11">
-                    <div class="border-light shadow-sm rounded">
-                        <div class="g-0">
-                            <div class="col-12 d-flex align-items-center justify-content-center rounded">
-                                <div class="col-12 col-lg-11 col-xl-10">
-                                    <div class="card-body p-3 p-md-4 p-xl-5">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div class="mb-5">
-                                                    <div class="text-center mb-4">
-                                                        <a href="{{ route('home') }}">
-                                                            <img class="logo_conduongbachu"
-                                                                src="{{ asset('assets/images/logo/logo_site.webp') }}"
-                                                                alt="logo_conduongbachu">
-                                                        </a>
-                                                    </div>
-                                                    <h4 class="text-center color-coins-refund">Bạn quên mật khẩu rồi à?</h4>
-                                                </div>
-                                            </div>
-                                        </div>
-                                       
-                                        <form id="forgotForm">
-                                            <div class="row gy-3 gx-0 overflow-hidden">
-                                                <div class="col-12 form-email">
-                                                    <div class="form-floating mb-3">
-                                                        <input type="email"
-                                                            class="form-control @error('email') is-invalid @enderror"
-                                                            name="email" id="email" placeholder="name@example.com"
-                                                            value="{{ old('email') }}" required>
-                                                        <label for="email" class="form-label">Nhập email của bạn</label>
-                                                    </div>
-                                                </div>
+                <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                    <div class="auth-card p-4 p-md-5">
+                        <div class="text-center mb-4">
+                            <a href="{{ route('home') }}">
+                                @php
+                                    // Get the logo and favicon from LogoSite model
+                                    $logoSite = \App\Models\LogoSite::first();
+                                    $logoPath =
+                                        $logoSite && $logoSite->logo
+                                            ? Storage::url($logoSite->logo)
+                                            : asset('assets/images/logo/logo_site.webp');
+                                @endphp
+                                <img class="auth-logo mb-4" src="{{ $logoPath }}" alt="logo">
+                            </a>
+                            <h1 class="auth-title">Bạn quên mật khẩu rồi à?</h1>
+                        </div>
 
-                                                <div id="otpContainer" class="overflow-hidden text-center">
-
-                                                </div>
-
-                                                <div id="passwordContainer" ></div>
-
-                                                <div class="box-button col-12">
-                                                    <button
-                                                        class="w-100 btn btn-lg border-coins-refund-2 color-coins-refund"
-                                                        type="submit" id="btn-send">Tiếp tục</button>
-                                                </div>
-
-                                            </div>
-                                        </form>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div
-                                                    class="d-flex gap-2 gap-md-4 flex-column flex-md-row justify-content-md-center mt-5">
-                                                    <span>Bạn đã nhớ mật khẩu? <a href="{{ route('login') }}" class="link-secondary text-decoration-none color-coins-refund">Đăng nhập</a></span>
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                        <form id="forgotForm">
+                            <div class="form-email mb-4">
+                                <div class="form-floating">
+                                    <input type="email" class="form-control" name="email" id="email"
+                                        placeholder="name@example.com" required>
+                                    <label for="email">Nhập email của bạn</label>
                                 </div>
                             </div>
-                        </div>
+
+                            <div id="otpContainer" class="overflow-hidden text-center">
+                                <!-- OTP inputs will be inserted here via JavaScript -->
+                            </div>
+
+                            <div id="passwordContainer"></div>
+
+                            <div class="box-button">
+                                <button type="submit" class="auth-btn btn w-100 mb-4" id="btn-send">
+                                    Tiếp Tục
+                                </button>
+                            </div>
+
+                            <div class="text-center">
+                                <span>Bạn đã nhớ mật khẩu? </span>
+                                <a href="{{ route('login') }}" class="auth-link">Đăng nhập</a>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 @endsection
+
 @push('scripts-main')
     <script>
         $(document).ready(function() {
@@ -135,21 +122,21 @@
                             $('.form-email').remove();
 
                             $('#otpContainer').html(`
-                        <span class="text-center mb-1">${response.message}</span>
-                        <div class="otp-container justify-content-center mb-3" id="input-otp">
-                            <input type="text" maxlength="1" class="otp-input" oninput="handleInput(this)" />
-                            <input type="text" maxlength="1" class="otp-input" oninput="handleInput(this)" />
-                            <input type="text" maxlength="1" class="otp-input" oninput="handleInput(this)" />
-                            <input type="text" maxlength="1" class="otp-input" oninput="handleInput(this)" />
-                            <input type="text" maxlength="1" class="otp-input" oninput="handleInput(this)" />
-                            <input type="text" maxlength="1" class="otp-input" oninput="handleInput(this)" />
-                            <br>
-                        </div>
-                    `);
+                                <span class="text-center mb-1">${response.message}</span>
+                                <div class="otp-container justify-content-center mb-3" id="input-otp">
+                                    <input type="text" maxlength="1" class="otp-input" oninput="handleInput(this)" />
+                                    <input type="text" maxlength="1" class="otp-input" oninput="handleInput(this)" />
+                                    <input type="text" maxlength="1" class="otp-input" oninput="handleInput(this)" />
+                                    <input type="text" maxlength="1" class="otp-input" oninput="handleInput(this)" />
+                                    <input type="text" maxlength="1" class="otp-input" oninput="handleInput(this)" />
+                                    <input type="text" maxlength="1" class="otp-input" oninput="handleInput(this)" />
+                                    <br>
+                                </div>
+                            `);
 
                             $('.box-button').html(`
-                        <button class="w-100 btn btn-lg border-coins-refund-2 color-coins-refund" type="button" id="submitOtp">Tiếp tục</button>
-                    `);
+                                <button class="auth-btn btn w-100 mb-4" type="button" id="submitOtp">Tiếp tục</button>
+                            `);
 
                             $('#submitOtp').on('click', function() {
                                 const otpInputs = $('.otp-input');
@@ -162,11 +149,7 @@
 
                                 input_otp.find('.invalid-otp').remove();
 
-                                const oldInvalidFeedbackEmail = emailInput.parent().find('.invalid-feedback');
-                                emailInput.removeClass('is-invalid');
-                                if (oldInvalidFeedbackEmail.length) {
-                                    oldInvalidFeedbackEmail.remove();
-                                }
+                                removeInvalidFeedback(emailInput);
 
                                 $.ajax({
                                     url: '{{ route('forgot.password') }}',
@@ -180,37 +163,41 @@
                                         otp: otp,
                                     }),
                                     success: function(response) {
-                                        
+
                                         if (response.status === 'success') {
                                             showToast(response.message,
                                                 'success');
-                                                $('#submitOtp').remove();
-                                                $('#otpContainer').remove();
+                                            $('#submitOtp').remove();
+                                            $('#otpContainer').remove();
 
-                                                $('#passwordContainer').html(`
-                                                <span class="text-center mb-1">${response.message}</span>
-                                                <div class="col-12">
+                                            $('#passwordContainer').html(`
+                                                <div class="mb-4">
+                                                    <span class="text-center d-block mb-3">${response.message}</span>
                                                     <div class="form-floating mb-3 position-relative">
                                                         <input type="password" class="form-control" name="password" id="password" value="" placeholder="Password" required>
-                                                        <label for="password" class="form-label">Mật khẩu</label>
+                                                        <label for="password" class="form-label">Mật khẩu mới</label>
                                                         <i class="fa fa-eye position-absolute top-50 end-0 translate-middle-y me-3 cursor-pointer" id="togglePassword"></i>
                                                     </div>
                                                 </div>
                                             `);
 
-                                                    $('.box-button').html(`
-                                                <button class="w-100 btn btn-lg border-coins-refund-2 color-coins-refund" type="button" id="submitPassword">Xác nhận</button>
+                                            $('.box-button').html(`
+                                                <button class="auth-btn btn w-100 mb-4" type="button" id="submitPassword">Xác nhận</button>
                                             `);
+                                            
+                                            // Add toggle password functionality
+                                            $('#togglePassword').on('click', function() {
+                                                const passwordInput = $('#password');
+                                                const type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
+                                                passwordInput.attr('type', type);
+                                                $(this).toggleClass('fa-eye fa-eye-slash');
+                                            });
 
                                             $('#submitPassword').on('click', function() {
                                                 const passwordInput = $('#password');
                                                 const password = passwordInput.val();
 
-                                                const oldInvalidFeedback = passwordInput.parent().find('.invalid-feedback');
-                                                passwordInput.removeClass('is-invalid');
-                                                    if (oldInvalidFeedback.length) {
-                                                    oldInvalidFeedback.remove();
-                                                }
+                                                removeInvalidFeedback(passwordInput);
 
                                                 $.ajax({
                                                     url: '{{ route('forgot.password') }}',
@@ -226,20 +213,16 @@
                                                     }),
                                                     success: function(response) {
                                                         if (response.status === 'success') {
-                                                            showToast(response.message,
-                                                                'success');
-                                                            saveToast(response.message,
-                                                                response.status);
-                                                            window.location.href = response
-                                                                .url;
+                                                            showToast(response.message, 'success');
+                                                            saveToast(response.message, response.status);
+                                                            window.location.href = response.url;
                                                         } else {
                                                             showToast(response.message, 'error');
                                                         }
                                                     },
                                                     error: function(xhr) {
                                                         const response = xhr.responseJSON;
-                                                        console.log('Error2:', response);
-
+                                                        
                                                         if (response && response.status === 'error') {
                                                             if (response.message.password) {
                                                                 response.message.password.forEach(error => {
@@ -253,19 +236,14 @@
                                                     }
                                                 });
                                             });
-
-
                                         } else {
-                                            showToast(response.message,
-                                                'error');
+                                            showToast(response.message, 'error');
                                         }
                                     },
                                     error: function(xhr) {
                                         const response = xhr.responseJSON;
-                                        console.log('Error2:', response);
-
-                                        if (response && response.status ===
-                                            'error') {
+                                        
+                                        if (response && response.status === 'error') {
                                             if (response.message.email) {
                                                 response.message.email.forEach(error => {
                                                     const invalidFeedback = $('<div class="invalid-feedback"></div>').text(error);
@@ -276,14 +254,11 @@
                                                 input_otp.append(`<div class="invalid-otp text-danger fs-7">${response.message.otp[0]}</div>`);
                                             }
                                         } else {
-                                            showToast(
-                                                'Đã xảy ra lỗi, vui lòng thử lại.',
-                                                'error');
+                                            showToast('Đã xảy ra lỗi, vui lòng thử lại.', 'error');
                                         }
                                     }
                                 });
                             });
-
                         } else {
                             showToast(response.message, 'error');
                             submitButton.prop('disabled', false);
@@ -292,8 +267,7 @@
                     },
                     error: function(xhr) {
                         const response = xhr.responseJSON;
-console.log('Error1:', response);
-
+                        
                         if (response && response.message && response.message.email) {
                             response.message.email.forEach(error => {
                                 const invalidFeedback = $('<div class="invalid-feedback"></div>').text(error);
@@ -307,6 +281,15 @@ console.log('Error1:', response);
                     }
                 });
             });
+            
+            // Helper function to remove invalid feedback
+            function removeInvalidFeedback(input) {
+                const oldInvalidFeedback = input.parent().find('.invalid-feedback');
+                input.removeClass('is-invalid');
+                if (oldInvalidFeedback.length) {
+                    oldInvalidFeedback.remove();
+                }
+            }
         });
     </script>
 @endpush

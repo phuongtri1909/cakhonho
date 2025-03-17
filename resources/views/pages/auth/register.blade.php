@@ -43,8 +43,15 @@
                     <div class="auth-card p-4 p-md-5">
                         <div class="text-center mb-4">
                             <a href="{{ route('home') }}">
-                                <img class="auth-logo mb-4" src="{{ asset('assets/images/logo/logo_site.webp') }}"
-                                    alt="logo">
+                                @php
+                                    // Get the logo and favicon from LogoSite model
+                                    $logoSite = \App\Models\LogoSite::first();
+                                    $logoPath =
+                                        $logoSite && $logoSite->logo
+                                            ? Storage::url($logoSite->logo)
+                                            : asset('assets/images/logo/logo_site.webp');
+                                @endphp
+                                <img class="auth-logo mb-4" src="{{ $logoPath }}" alt="logo">
                             </a>
                             <h1 class="auth-title">Tạo Tài Khoản Mới</h1>
                         </div>
@@ -252,23 +259,24 @@
                                                         const
                                                             invalidFeedback =
                                                             $(
-                                                                '<div class="invalid-feedback"></div>')
+                                                                '<div class="invalid-feedback"></div>'
+                                                                )
                                                             .text(
-                                                            error);
+                                                                error);
                                                         emailInput
                                                             .addClass(
                                                                 'is-invalid'
-                                                                )
+                                                            )
                                                             .parent()
                                                             .append(
                                                                 invalidFeedback
-                                                                );
+                                                            );
                                                     });
                                             }
                                             if (response.message.otp) {
                                                 input_otp.append(
                                                     `<div class="invalid-otp text-danger fs-7">${response.message.otp[0]}</div>`
-                                                    );
+                                                );
                                             }
                                             if (response.message.password) {
                                                 response.message.password
@@ -276,17 +284,18 @@
                                                         const
                                                             invalidFeedback =
                                                             $(
-                                                                '<div class="invalid-feedback"></div>')
+                                                                '<div class="invalid-feedback"></div>'
+                                                                )
                                                             .text(
-                                                            error);
+                                                                error);
                                                         passwordInput
                                                             .addClass(
                                                                 'is-invalid'
-                                                                )
+                                                            )
                                                             .parent()
                                                             .append(
                                                                 invalidFeedback
-                                                                );
+                                                            );
                                                     });
                                             }
                                             if (response.message.name) {
@@ -295,17 +304,18 @@
                                                         const
                                                             invalidFeedback =
                                                             $(
-                                                                '<div class="invalid-feedback"></div>')
+                                                                '<div class="invalid-feedback"></div>'
+                                                                )
                                                             .text(
-                                                            error);
+                                                                error);
                                                         nameInput
                                                             .addClass(
                                                                 'is-invalid'
-                                                                )
+                                                            )
                                                             .parent()
                                                             .append(
                                                                 invalidFeedback
-                                                                );
+                                                            );
                                                     });
                                             }
 
@@ -318,13 +328,14 @@
                                                         const
                                                             invalidFeedback =
                                                             $(
-                                                                '<div class="invalid-feedback d-block text-center"></div>')
+                                                                '<div class="invalid-feedback d-block text-center"></div>'
+                                                                )
                                                             .text(
-                                                            error);
+                                                                error);
                                                         $('.avatar-helper')
                                                             .append(
                                                                 invalidFeedback
-                                                                );
+                                                            );
                                                     });
                                             } else {
                                                 $('.avatar-helper small')
