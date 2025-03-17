@@ -59,19 +59,13 @@ class AffiliateRedirect
                     // Update the timestamp
                     Session::put($sessionKey, $now);
                     
-                    // Sử dụng trang trung gian thay vì chuyển hướng trực tiếp
-                    return response()->view('pages.affiliate-redirect', [
-                        'affiliateLink' => $entity->link_aff
-                    ]);
+                    // Redirect to affiliate link
+                    return redirect($entity->link_aff);
                 }
             } else {
                 // First visit, store timestamp and redirect
                 Session::put($sessionKey, Carbon::now());
-                
-                // Sử dụng trang trung gian thay vì chuyển hướng trực tiếp
-                return response()->view('pages.affiliate-redirect', [
-                    'affiliateLink' => $entity->link_aff
-                ]);
+                return redirect($entity->link_aff);
             }
         }
         
