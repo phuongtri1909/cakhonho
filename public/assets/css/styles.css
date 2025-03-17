@@ -443,6 +443,9 @@ body {
     ) !important;
 }
 
+.text-justify{
+    text-align: justify;
+}
 
 /* Add these styles for the sticky header */
 .transition-header {

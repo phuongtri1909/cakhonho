@@ -14,7 +14,7 @@
                     @endphp
                     <img height="90" src="{{ $logoPath }}" alt="{{ config('app.name') }} logo">
                     @if ($donate)
-                        <p class="mt-2">
+                        <p class="mt-2 text-justify">
                             {!! $donate->about_us !!}
                         </p>
                     @endif
