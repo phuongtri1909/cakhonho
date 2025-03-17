@@ -295,7 +295,7 @@ class StoryController extends Controller
             DB::rollBack();
             \Log::error('Error deleting story:', ['error' => $e->getMessage()]);
             return redirect()->route('stories.index')
-                ->with('error', 'Có lỗi xảy ra khi xóa truyện.');
+                ->with('error', 'Có lỗi xảy ra khi xóa truyện.' . $e->getMessage());
         }
 
         return redirect()->route('stories.index')
