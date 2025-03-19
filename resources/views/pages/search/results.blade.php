@@ -76,7 +76,7 @@
                                         </div>
                                     </div>
                                     <div class="story-description mt-2 small text-muted d-none d-md-block">
-                                        {{ Str::limit($story->description, 150) }}
+                                        {!! Str::limit($story->description, 150) !!}
                                     </div>
                                 </div>
                             </div>
