@@ -14,6 +14,7 @@ use App\Http\Controllers\RatingController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\DepositController;
 use App\Http\Controllers\ReadingController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SocialsController;
@@ -21,6 +22,8 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LogoSiteController;
 use App\Http\Controllers\RecentlyReadController;
 use App\Http\Controllers\CommentReactionController;
+use App\Http\Controllers\Admin\BankController as AdminBankController;
+use App\Http\Controllers\PurchaseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,10 +71,16 @@ Route::group(['middleware' => 'check.ip.ban'], function () {
         Route::post('update-avatar', [UserController::class, 'updateAvatar'])->name('update.avatar');
         Route::post('update-password', [UserController::class, 'updatePassword'])->name('update.password');
 
+
+         // Deposit Routes
+         Route::get('/deposit', [DepositController::class, 'index'])->name('user.deposit');
+         Route::post('/deposit/validate', [DepositController::class, 'validatePayment'])->name('user.deposit.validate');
+         Route::post('/deposit', [DepositController::class, 'store'])->name('user.deposit.store');
+
         Route::group(['middleware' => 'auth'], function () {
 
             Route::middleware(['check.ban:ban_comment'])->group(function () {
-                Route::post('comment/store', [CommentController::class, 'storeClient'])->name('comment.store.client');
+                Route::post('/comment/store', [CommentController::class, 'storeClient'])->name('comment.store.client');
             });
 
             Route::middleware(['check.ban:ban_rate'])->group(function () {
@@ -80,6 +89,10 @@ Route::group(['middleware' => 'check.ip.ban'], function () {
                     abort(404);
                 });
             });
+
+            // Routes for purchasing
+            Route::post('/purchase/chapter', [PurchaseController::class, 'purchaseChapter'])->name('purchase.chapter');
+            Route::post('/purchase/story-combo', [PurchaseController::class, 'purchaseStoryCombo'])->name('purchase.story.combo');
 
             Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -110,6 +123,8 @@ Route::group(['middleware' => 'check.ip.ban'], function () {
                     Route::get('stories/{story}/comments', [CommentController::class, 'index'])->name('stories.comments.index');
                     Route::delete('comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
+                    Route::get('comments', [CommentController::class, 'allComments'])->name('comments.all');
+
                     Route::delete('delete-comments/{comment}', [CommentController::class, 'deleteComment'])->name('delete.comments');
                 
                     Route::resource('banners', BannerController::class);
@@ -119,6 +134,16 @@ Route::group(['middleware' => 'check.ip.ban'], function () {
 
                     Route::get('/admin/donate', [DonateController::class, 'edit'])->name('donate.edit');
                     Route::put('/admin/donate', [DonateController::class, 'update'])->name('donate.update');
+                
+                    // Quản lý giao dịch nạp xu
+                    Route::get('/deposits', [DepositController::class, 'adminIndex'])->name('deposits.index');
+                    Route::post('/deposits/{deposit}/approve', [DepositController::class, 'approve'])->name('deposits.approve');
+                    Route::post('/deposits/{deposit}/reject', [DepositController::class, 'reject'])->name('deposits.reject');
+
+                    Route::group(['as' => 'admin.'], function () {
+                        // Quản lý ngân hàng
+                        Route::resource('banks', AdminBankController::class);
+                    });
                 });
             });
         });
@@ -145,6 +170,9 @@ Route::group(['middleware' => 'check.ip.ban'], function () {
                     return view('admin.pages.auth.login');
                 })->name('admin.login');
             });
+
+            Route::get('auth/google', [AuthController::class, 'redirectToGoogle'])->name('login.google');
+            Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
         });
     });
 });

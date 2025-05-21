@@ -317,10 +317,31 @@ class HomeController extends Controller
             } else {
                 // Regular users can only see published chapters
                 $chapter = $query->where('status', 'published')->firstOrFail();
+                
+                // Check if chapter is free or user has purchased it
+                if (!$chapter->is_free) {
+                    // Check if user has purchased this chapter individually
+                    $hasChapterAccess = $chapter->purchases()->where('user_id', auth()->id())->exists();
+                    
+                    // Check if user has purchased the story combo
+                    $hasStoryAccess = $story->purchases()->where('user_id', auth()->id())->exists();
+                    
+                    if (!$hasChapterAccess && !$hasStoryAccess) {
+                        // User hasn't purchased this chapter or story combo
+                        return redirect()->route('show.page.story', $story->slug)
+                            ->with('error', 'Bạn cần mua chương này để đọc nội dung.');
+                    }
+                }
             }
         } else {
             // Guests can only see published chapters
             $chapter = $query->where('status', 'published')->firstOrFail();
+            
+            // Guests can only access free chapters
+            if (!$chapter->is_free) {
+                return redirect()->route('login')
+                    ->with('error', 'Bạn cần đăng nhập và mua chương này để đọc nội dung.');
+            }
         }
 
         // Get client IP for view count

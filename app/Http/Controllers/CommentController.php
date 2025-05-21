@@ -101,7 +101,7 @@ class CommentController extends Controller
     {
         $comment = Comment::findOrFail($commentId);
 
-        if (!auth()->user()->isAdmin() || $comment->level !== 0) {
+        if (auth()->user()->role !== 'admin' || $comment->level !== 0) {
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 403);
         }
 
@@ -246,36 +246,137 @@ class CommentController extends Controller
         ]);
     }
 
-   
-
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request, Story $story)
+    // Add a new method to view all comments
+    public function allComments(Request $request)
     {
+        $authUser = auth()->user();
         $search = $request->search;
         $userId = $request->user;
-        $authUser = auth()->user();
+        $storyId = $request->story;
+        $date = $request->date;
 
-        $query = $story->comments()->with(['user', 'replies']);
+        // Begin with all comments query
+        $query = Comment::with(['user', 'story']);
 
-        // If mod, only show user and vip comments
+        // Apply role-based restrictions
         if ($authUser->role === 'mod') {
             $query->whereHas('user', function ($q) {
                 $q->whereIn('role', ['user']);
             });
         }
 
+        // Create a base query that we'll modify based on filters
+        $baseQuery = clone $query;
+
+        // Find all parent IDs of comments that match our search (for showing full threads)
+        $matchingChildIds = collect([]);
+        $parentIdsToInclude = collect([]);
+
+        // If we're searching content, user, or date, we need to find matches in child comments too
+        if ($search || $userId || $date) {
+            $childQuery = clone $baseQuery;
+            
+            // Apply content search to child query
+            if ($search) {
+                $childQuery->where('comment', 'like', '%' . $search . '%');
+            }
+            
+            // Apply user filter to child query
+            if ($userId) {
+                $childQuery->where('user_id', $userId);
+            }
+            
+            // Apply date filter to child query
+            if ($date) {
+                $childQuery->whereDate('created_at', $date);
+            }
+            
+            // Get the IDs of all comments matching our filters
+            $matchingChildIds = $childQuery->pluck('id');
+            
+            // Find all parent IDs for these matching comments
+            if ($matchingChildIds->isNotEmpty()) {
+                $parentIds = Comment::whereIn('id', $matchingChildIds)
+                    ->whereNotNull('reply_id')
+                    ->pluck('reply_id');
+                
+                // Get all grandparent IDs recursively
+                $allParentIds = collect([]);
+                $currentParentIds = $parentIds;
+                
+                while ($currentParentIds->isNotEmpty()) {
+                    $allParentIds = $allParentIds->merge($currentParentIds);
+                    $currentParentIds = Comment::whereIn('id', $currentParentIds)
+                        ->whereNotNull('reply_id')
+                        ->pluck('reply_id');
+                }
+                
+                $parentIdsToInclude = $allParentIds->unique();
+            }
+        }
+
+        // Apply story filter (this applies to all comments regardless of level)
+        if ($storyId) {
+            $query->where('story_id', $storyId);
+        }
+
+        // Now build our main query
+        // Get top-level comments that either:
+        // 1. Match our filters directly, or
+        // 2. Have child comments that match our filters
+        $finalQuery = Comment::with(['user', 'story'])
+            ->with(['replies.user', 'replies.replies.user', 'replies.replies.replies.user'])
+            ->whereNull('reply_id');
+            
+        // Apply direct filters
         if ($search) {
-            $query->where('comment', 'like', '%' . $search . '%');
+            $finalQuery->where(function($q) use ($search, $parentIdsToInclude, $matchingChildIds) {
+                $q->where('comment', 'like', '%' . $search . '%')
+                  ->orWhereIn('id', $parentIdsToInclude)
+                  ->orWhereIn('id', $matchingChildIds->filter(function($id) {
+                      return Comment::find($id) && Comment::find($id)->reply_id === null;
+                  }));
+            });
         }
 
         if ($userId) {
-            $query->where('user_id', $userId);
+            $finalQuery->where(function($q) use ($userId, $parentIdsToInclude, $matchingChildIds) {
+                $q->where('user_id', $userId)
+                  ->orWhereIn('id', $parentIdsToInclude)
+                  ->orWhereIn('id', $matchingChildIds->filter(function($id) {
+                      return Comment::find($id) && Comment::find($id)->reply_id === null;
+                  }));
+            });
         }
 
-        $comments = $query->orderBy('id', 'desc')->paginate(15);
+        if ($date) {
+            $finalQuery->where(function($q) use ($date, $parentIdsToInclude, $matchingChildIds) {
+                $q->whereDate('created_at', $date)
+                  ->orWhereIn('id', $parentIdsToInclude)
+                  ->orWhereIn('id', $matchingChildIds->filter(function($id) {
+                      return Comment::find($id) && Comment::find($id)->reply_id === null;
+                  }));
+            });
+        }
 
+        // Apply story filter
+        if ($storyId) {
+            $finalQuery->where('story_id', $storyId);
+        }
+
+        // Apply role-based restrictions
+        if ($authUser->role === 'mod') {
+            $finalQuery->whereHas('user', function ($q) {
+                $q->whereIn('role', ['user']);
+            });
+        }
+
+        $comments = $finalQuery->orderBy('id', 'desc')->paginate(15);
+
+        // Get all stories for the filter dropdown
+        $stories = Story::orderBy('title')->get();
+
+        // Get all users who have commented
         $usersQuery = \App\Models\User::whereHas('comments')
             ->where('active', 'active');
 
@@ -284,10 +385,10 @@ class CommentController extends Controller
         }
 
         $users = $usersQuery->orderBy('name')->get();
-
+        
         $totalComments = Comment::count();
 
-        return view('admin.pages.comments.index', compact('comments', 'users', 'totalComments', 'story'));
+        return view('admin.pages.comments.all', compact('comments', 'users', 'stories', 'totalComments'));
     }
 
     /**
@@ -298,7 +399,7 @@ class CommentController extends Controller
         $authUser = auth()->user();
         $comment = Comment::find($comment);
         if (!$comment) {
-            return redirect()->route('comments.index')->with('error', 'Không tìm thấy bình luận này');
+            return redirect()->route('comments.all')->with('error', 'Không tìm thấy bình luận này');
         }
 
         if (
@@ -306,9 +407,9 @@ class CommentController extends Controller
             ($authUser->role === 'mod' && (!$comment->user || $comment->user->role !== 'admin'))
         ) {
             $comment->delete();
-            return redirect()->route('comments.index')->with('success', 'Xóa bình luận thành công');
+            return redirect()->route('comments.all')->with('success', 'Xóa bình luận thành công');
         }
 
-        return redirect()->route('comments.index')->with('error', 'Không thể xóa bình luận của Admin');
+        return redirect()->route('comments.all')->with('error', 'Không thể xóa bình luận của Admin');
     }
 }

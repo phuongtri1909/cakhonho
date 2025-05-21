@@ -1,3 +1,19 @@
+:root {
+    --primary-color-1: #ffe371;
+    --primary-color-2: #8ed7ff;
+    --primary-color-3: #d1bb61;
+    --primary-color-4: #cdedff;
+    --primary-color-5: #cdedff;
+    --primary-color-6: #cdedff;
+    --purple-color-1: #cdedff;
+    --purple-color-2: #cdedff;
+    --bg-list: #fafafa;
+    --color-text: #333;
+    --tw-text-opacity: 1;
+    --primary-rgb: #8ed7ff;
+    --success-color: #28a745;
+}
+
 body {
     font-family: 'Lora', serif;
     background: #e8e8e8;

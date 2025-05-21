@@ -97,6 +97,28 @@
             </li>
 
             <li class="nav-item">
+                <a class="nav-link {{ Route::currentRouteNamed('deposits.*') ? 'active' : '' }}"
+                    href="{{ route('deposits.index') }}">
+                    <div
+                        class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fa-solid fa-money-bill-transfer text-dark icon-sidebar"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Quản lý giao dịch</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ Route::currentRouteNamed('admin.banks.*') ? 'active' : '' }}"
+                    href="{{ route('admin.banks.index') }}">
+                    <div
+                        class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fa-solid fa-university text-dark icon-sidebar"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Quản lý Ngân hàng</span>
+                </a>
+            </li>
+
+            {{-- <li class="nav-item">
                 <a class="nav-link {{ Route::currentRouteNamed('donate.*') ? 'active' : '' }}"
                     href="{{ route('donate.edit') }}">
                     <div
@@ -105,7 +127,7 @@
                     </div>
                     <span class="nav-link-text ms-1">Cấu hình Donate</span>
                 </a>
-            </li>
+            </li> --}}
 
             <li class="nav-item">
                 <a class="nav-link {{ Route::currentRouteNamed('users.index') ? 'active' : '' }}"
@@ -115,6 +137,17 @@
                         <i class="fa-solid fa-users text-dark icon-sidebar"></i>
                     </div>
                     <span class="nav-link-text ms-1">Danh sách User</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ Route::currentRouteNamed('comments.all') ? 'active' : '' }}"
+                    href="{{ route('comments.all') }}">
+                    <div
+                        class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fa-solid fa-comments text-dark icon-sidebar"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Quản lý Bình luận</span>
                 </a>
             </li>
 

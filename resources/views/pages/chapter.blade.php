@@ -169,6 +169,97 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <script>
+        // Prevent copying content
+        document.addEventListener('DOMContentLoaded', function() {
+            const contentElement = document.getElementById('chapter-content');
+            
+            // Function to show notification when copy is attempted
+            function showCopyNotification() {
+                // Create toast element if it doesn't exist
+                if (!document.getElementById('copy-toast')) {
+                    const toast = document.createElement('div');
+                    toast.id = 'copy-toast';
+                    toast.style.position = 'fixed';
+                    toast.style.bottom = '20px';
+                    toast.style.right = '20px';
+                    toast.style.backgroundColor = 'rgba(0,0,0,0.8)';
+                    toast.style.color = 'white';
+                    toast.style.padding = '10px 15px';
+                    toast.style.borderRadius = '4px';
+                    toast.style.zIndex = '9999';
+                    toast.style.transition = 'opacity 0.3s ease';
+                    toast.style.opacity = '0';
+                    toast.style.pointerEvents = 'none';
+                    toast.textContent = 'Nội dung này không được phép sao chép!';
+                    document.body.appendChild(toast);
+                }
+                
+                // Show and then hide the toast
+                const toast = document.getElementById('copy-toast');
+                toast.style.opacity = '1';
+                
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                }, 3000);
+            }
+            
+            // Disable right-click
+            contentElement.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                showCopyNotification();
+                return false;
+            });
+            
+            // Disable cut, copy, paste
+            contentElement.addEventListener('cut', function(e) {
+                e.preventDefault();
+                showCopyNotification();
+                return false;
+            });
+            
+            contentElement.addEventListener('copy', function(e) {
+                e.preventDefault();
+                showCopyNotification();
+                return false;
+            });
+            
+            contentElement.addEventListener('paste', function(e) {
+                e.preventDefault();
+                showCopyNotification();
+                return false;
+            });
+            
+            // Disable keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Ctrl+C, Ctrl+X, Ctrl+V, Ctrl+P, Ctrl+S, F12
+                if ((e.ctrlKey && (e.key === 'c' || e.key === 'x' || e.key === 'v' || 
+                    e.key === 'p' || e.key === 's')) || e.key === 'F12') {
+                    if (window.getSelection && window.getSelection().toString() !== '' && 
+                        $(window.getSelection().focusNode).closest('#chapter-content').length) {
+                        e.preventDefault();
+                        showCopyNotification();
+                        return false;
+                    }
+                }
+            });
+            
+            // Disable dragging
+            contentElement.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+                showCopyNotification();
+                return false;
+            });
+            
+            // Disable selection via triple click
+            contentElement.addEventListener('mousedown', function(e) {
+                if (e.detail >= 3) {
+                    e.preventDefault();
+                    showCopyNotification();
+                    return false;
+                }
+            });
+        });
+
         // DOM elements - Fix: No redeclaration
         const contentElement = document.getElementById('chapter-content');
         const chapterSection = document.getElementById('chapter');
@@ -501,6 +592,50 @@
             scroll-behavior: smooth;
             transition: all 0.3s ease;
             box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            pointer-events: auto;
+            position: relative;
+        }
+        
+        /* Overlay to prevent element inspection for copying */
+        .chapter-content::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Image watermark for print protection */
+        @media print {
+            body { 
+                display: none; 
+            }
+            
+            .chapter-content {
+                visibility: hidden;
+            }
+            
+            html:after {
+                content: "Không được phép in nội dung này";
+                display: block;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.8);
+                color: white;
+                font-size: 30px;
+                padding-top: 50%;
+                text-align: center;
+            }
         }
 
         /* Typography improvements */

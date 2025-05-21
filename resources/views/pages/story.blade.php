@@ -82,6 +82,12 @@
 
         <div class=" mt-4">
 
+            <div class="container">
+                @if (isset($story) && $story->has_combo)
+                    @include('components.combo_story', ['story' => $story])
+                @endif
+            </div>
+
             <div class="" id="chapters">
                 @if (!Auth()->check() || (Auth()->check() && Auth()->user()->ban_read == false))
                     @include('components.all_chapter', ['chapters' => $chapters])
@@ -110,6 +116,9 @@
         </div>
     </section>
 
+    @auth
+        @include('components.modals.chapter-purchase-modal')
+    @endauth
 @endsection
 
 @push('scripts')

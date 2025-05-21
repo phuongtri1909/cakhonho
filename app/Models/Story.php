@@ -19,6 +19,8 @@ class Story extends Model
         'cover_thumbnail',
         'completed',
         'link_aff',
+        'combo_price',
+        'has_combo'
     ];
 
 
@@ -46,6 +48,19 @@ class Story extends Model
     {
         return $this->belongsToMany(Category::class)
             ->withTimestamps();
+    }
+
+    public function purchases()
+    {
+        return $this->hasMany(StoryPurchase::class);
+    }
+
+    /**
+     * Check if a user has purchased this story combo
+     */
+    public function isPurchasedBy($userId)
+    {
+        return $this->purchases()->where('user_id', $userId)->exists();
     }
 
     public function scopePublished($query)

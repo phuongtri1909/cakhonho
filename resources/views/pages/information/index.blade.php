@@ -1,148 +1,139 @@
-@extends('layouts.app')
-@section('title', 'Thông tin cá nhân')
-@section('description', 'Thông tin cá nhân của bạn trên ' . request()->getHost() )
-@section('keyword', 'Thông tin cá nhân, thông tin tài khoản, ' . request()->getHost() )
-@push('styles')
-    <style>
-        .avatar {
-            width: 100px;
-            height: 100px;
-            background: #f1f1f1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-    </style>
-@endpush
+@extends('layouts.information')
 
-@section('content')
-    @include('components.toast')
+@section('info_title', 'Thông tin cá nhân')
+@section('info_description', 'Thông tin cá nhân của bạn trên ' . request()->getHost())
+@section('info_keyword', 'Thông tin cá nhân, thông tin tài khoản, ' . request()->getHost())
+@section('info_section_title', 'Thông tin người dùng')
+@section('info_section_desc', 'Quản lý thông tin cá nhân của bạn')
 
-    <div class="custom-container container-fluid mt-80 mb-5">
-        <section class="">
-            <div class="p-3 bg-white box-shadow">
-                <div class="d-flex">
-                    <div class="rounded-circle border border-5 avatar border-secondary" id="avatar">
-                        @if (!empty($user->avatar))
-                            <img id="avatarImage" class="rounded-circle" src="{{ Storage::url($user->avatar) }}" alt="Avatar"
-                                style="width: 100%; height: 100%; object-fit: cover;">
-                        @else
-                            <i class="fa-solid fa-user" id="defaultIcon"></i>
-                        @endif
+@section('info_content')
+    <div class="row">
+        <div class="col-md-4 col-sm-5 mb-4 mb-sm-0">
+            <div class="text-center">
+                <div class="profile-avatar-edit" id="avatar">
+                    @if (!empty($user->avatar))
+                        <img id="avatarImage" class="profile-avatar" src="{{ Storage::url($user->avatar) }}" alt="Avatar">
+                    @else
+                        <div class="profile-avatar d-flex align-items-center justify-content-center bg-light">
+                            <i class="fa-solid fa-user fa-2x" id="defaultIcon"></i>
+                        </div>
+                    @endif
+                    <div class="avatar-edit-overlay">
+                        <i class="fas fa-camera me-1"></i> Cập nhật
                     </div>
-                    <input type="file" id="avatarInput" style="display: none;" accept="image/*">
-                    <div>
-                        <h5 class="mt-3 ms-2">{{ $user->name }}</h5>
-                        <span class="mt-3 ms-2">{{ $user->email }}</span>
+                </div>
+                <input type="file" id="avatarInput" style="display: none;" accept="image/*">
+                
+                <div class="mt-3">
+                    <h5 class="mb-1">{{ $user->name }}</h5>
+                    <div class="text-muted small">
+                        <i class="fas fa-calendar-alt me-1"></i> Tham gia từ: {{ $user->created_at->format('d/m/Y') }}
                     </div>
                 </div>
             </div>
-        </section>
-
-        <section class="mt-2 ">
-            <div class="bg-white box-shadow ">
-                <div class="p-3 d-flex justify-content-between border-bottom">
-                    <span class="fw-semibold">ID</span>
-                    <span>{{ $user->id }}</span>
+        </div>
+        
+        <div class="col-md-8 col-sm-7">
+            <div class="profile-info-card">
+                <div class="profile-info-item">
+                    <div class="profile-info-label">
+                        <i class="fas fa-fingerprint"></i> ID người dùng
+                    </div>
+                    <div class="profile-info-value">
+                        {{ $user->id }}
+                    </div>
                 </div>
-                <!-- Link chỉnh sửa -->
-                <a href="#" class="underline-none text-dark p-3 d-flex justify-content-between border-bottom"
-                    data-bs-toggle="modal" data-bs-target="#editModal" data-type="name">
-                    <span class="fw-semibold">Họ và tên</span>
-                    <div>
-                        <span>{{ $user->name ? $user->name : '' }}</span>
-                        <i class="fa-solid fa-chevron-right ms-2"></i>
+                
+                <div class="profile-info-item">
+                    <div class="profile-info-label">
+                        <i class="fas fa-user"></i> Họ và tên
                     </div>
-                </a>
-
-                <a href="#" class="underline-none text-dark p-3 d-flex justify-content-between border-bottom"
-                    data-bs-toggle="modal" data-bs-target="#otpPWModal">
-                    <span class="fw-semibold">Mật khẩu</span>
-                    <div>
-                        <span>******</span>
-                        <i class="fa-solid fa-chevron-right ms-2"></i>
+                    <div class="profile-info-value d-flex align-items-center">
+                        <span class="me-2">{{ $user->name ?: 'Chưa cập nhật' }}</span>
+                        <button class="btn btn-sm profile-edit-btn" data-bs-toggle="modal" data-bs-target="#editModal" data-type="name">
+                            <i class="fas fa-edit me-1"></i> Sửa
+                        </button>
                     </div>
-                </a>
+                </div>
+                
+                <div class="profile-info-item">
+                    <div class="profile-info-label">
+                        <i class="fas fa-envelope"></i> Email
+                    </div>
+                    <div class="profile-info-value">
+                        {{ $user->email }}
+                    </div>
+                </div>
+                
+                <div class="profile-info-item">
+                    <div class="profile-info-label">
+                        <i class="fas fa-lock"></i> Mật khẩu
+                    </div>
+                    <div class="profile-info-value d-flex align-items-center">
+                        <span class="me-2">••••••••</span>
+                        <button class="btn btn-sm profile-edit-btn" data-bs-toggle="modal" data-bs-target="#otpPWModal">
+                            <i class="fas fa-key me-1"></i> Đổi mật khẩu
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Modals -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Chỉnh sửa thông tin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm" action="{{ route('update.name.or.phone') }}" method="post">
+                        @csrf
+                        <div class="mb-3" id="formContent">
+                            <!-- Nội dung sẽ được cập nhật dựa trên loại dữ liệu được chọn -->
+                        </div>
+                        <div class="text-end">
+                            <button type="button" class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">Đóng</button>
+                            <button type="submit" class="btn btn-outline-success click-scroll"
+                                id="saveChanges">Lưu thay đổi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- Modal -->
-                <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="editModalLabel">Chỉnh sửa thông tin</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="editForm" action="{{ route('update.name.or.phone') }}" method="post">
-                                    @csrf
-                                    <div class="mb-3" id="formContent">
-                                        <!-- Nội dung sẽ được cập nhật dựa trên loại dữ liệu được chọn -->
-                                    </div>
-                                    <div class="text-end">
-
-                                        <button type="button" class="btn btn-outline-secondary"
-                                            data-bs-dismiss="modal">Đóng</button>
-                                        <button type="submit" class="btn btn-outline-success click-scroll"
-                                            id="saveChanges">Lưu
-                                            thay
-                                            đổi</button>
-                                    </div>
-
-                                </form>
+    <div class="modal fade" id="otpPWModal" tabindex="-1" aria-labelledby="otpPWModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="otpPWModalLabel">Xác thực OTP để đổi mật khẩu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="otpPWForm">
+                        @csrf
+                        <div class="mb-3 d-flex flex-column align-items-center" id="formOTPPWContent">
+                            <div class="spinner-border text-success" role="status">
+                                <span class="visually-hidden">Loading...</span>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="modal fade" id="otpPWModal" tabindex="-1" aria-labelledby="otpPWModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="otpPWModalLabel">Xác thực OTP để đổi mật khẩu</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="otpPWForm">
-                                    @csrf
-                                    <div class="mb-3 d-flex flex-column align-items-center" id="formOTPPWContent">
-                                        <div class="spinner-border text-success" role="status">
-                                            <span class="visually-hidden">Loading...</span>
-                                        </div>
-                                    </div>
-                                    <div class="text-end box-button-update">
-
-                                        <button type="button" class="btn btn-outline-secondary"
-                                            data-bs-dismiss="modal">Đóng</button>
-                                        <button type="submit" class="btn btn-outline-success" id="btn-send-otpPW">Tiếp
-                                            tục</button>
-                                    </div>
-                                </form>
-                            </div>
+                        <div class="text-end box-button-update">
+                            <button type="button" class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">Đóng</button>
+                            <button type="submit" class="btn btn-outline-success" id="btn-send-otpPW">Tiếp tục</button>
                         </div>
-                    </div>
-                </div>
-
-
-            </div>
-        </section>
-
-        <section class="mt-2 ">
-            <div class="bg-white box-shadow ">
-                <div class="p-3 border-bottom d-flex align-items-center">
-                    <div class="rounded-circle bg-info icon-menu d-flex align-items-center justify-content-center"><i
-                            class="fa-solid fa-arrow-right-from-bracket"></i></div>
-
-                    <a href="{{ route('logout') }}" class="fw-semibold ms-3 underline-none text-dark">Đăng xuất</a>
+                    </form>
                 </div>
             </div>
-        </section>
+        </div>
     </div>
 @endsection
 
-@push('scripts')
+@push('info_scripts')
     <script>
         $(document).ready(function() {
             // Click vào avatar để mở file input
@@ -159,10 +150,8 @@
                         // Hiển thị ảnh đã chọn
                         if (!$('#avatarImage').length) {
                             // Nếu chưa có ảnh (chỉ có icon), tạo thẻ <img> mới
-                            $('#avatar').html('<img id="avatarImage" class="rounded-circle" src="' + e
-                                .target.result +
-                                '" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">'
-                            );
+                            $('#avatar').html('<img id="avatarImage" class="profile-avatar" src="' + e.target.result +
+                                '" alt="Avatar"><div class="avatar-edit-overlay"><i class="fas fa-camera me-1"></i> Cập nhật</div>');
                             $('#defaultIcon').hide();
                         } else {
                             // Nếu đã có ảnh, chỉ cần thay đổi src của ảnh
@@ -184,16 +173,15 @@
                         },
                         success: function(response) {
                             if (response.status === 'success') {
-                                showToast(response.message,
-                                    'success');
-
+                                showToast(response.message, 'success');
                             } else {
                                 showToast(response.message, 'error');
                             }
                         },
                         error: function(xhr, status, error) {
                             const response = xhr.responseJSON;
-                            console.log('Error1:', response);
+                            console.log('Error:', response);
+                            showToast('Có lỗi xảy ra khi cập nhật ảnh đại diện', 'error');
                         }
                     });
                 }
@@ -213,15 +201,15 @@
                 if (type == 'name') {
                     modal.find('.modal-title').text('Chỉnh sửa Họ và Tên');
                     formContent.append(`
-                <label for="editValue" class="form-label">Họ và Tên</label>
-                <input type="text" class="form-control" id="editValue" name="name" value="{{ $user->name }}" required>
-            `);
+                        <label for="editValue" class="form-label">Họ và Tên</label>
+                        <input type="text" class="form-control" id="editValue" name="name" value="{{ $user->name }}" required>
+                    `);
                 } else if (type == 'phone') {
                     modal.find('.modal-title').text('Chỉnh sửa Số điện thoại');
                     formContent.append(`
-                <label for="editValue" class="form-label">Số điện thoại</label>
-                <input type="number" class="form-control" id="editValue" name="phone" value="{{ $user->phone }}" required>
-            `);
+                        <label for="editValue" class="form-label">Số điện thoại</label>
+                        <input type="number" class="form-control" id="editValue" name="phone" value="{{ $user->phone ?? '' }}" required>
+                    `);
                 } else {
                     showToast('Thao tác sai, hãy thử lại', 'error');
                 }
@@ -237,22 +225,24 @@
                 var formOTPContent = $('#formOTPPWContent');
                 formOTPContent.empty();
                 formOTPContent.append(`
-                                <span class="text-center mb-1 title-otp-pw">
-                                     <div class="spinner-border text-success" role="status">
-                                         <span class="visually-hidden">Loading...</span>
-                                     </div>
-                                </span>
-                                <div class="otp-container justify-content-center mb-3" id="input-otp-pw">
-                                    <input type="text" maxlength="1" class="otp-input" oninput="handleInput(this)" />
-                                    <input type="text" maxlength="1" class="otp-input" oninput="handleInput(this)" />
-                                    <input type="text" maxlength="1" class="otp-input" oninput="handleInput(this)" />
-                                    <input type="text" maxlength="1" class="otp-input" oninput="handleInput(this)" />
-                                    <input type="text" maxlength="1" class="otp-input" oninput="handleInput(this)" />
-                                    <input type="text" maxlength="1" class="otp-input" oninput="handleInput(this)" />
-                                    <br>
-                                </div>
-                            `);
+                    <p class="text-center mb-3">
+                        Chúng tôi sẽ gửi mã xác nhận OTP đến email của bạn. 
+                        Vui lòng nhập mã nhận được để tiếp tục.
+                    </p>
+                    <div class="spinner-border text-success mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="otp-input-container" id="input-otp-pw">
+                        <input type="text" maxlength="1" class="otp-digit" oninput="handleInput(this)" />
+                        <input type="text" maxlength="1" class="otp-digit" oninput="handleInput(this)" />
+                        <input type="text" maxlength="1" class="otp-digit" oninput="handleInput(this)" />
+                        <input type="text" maxlength="1" class="otp-digit" oninput="handleInput(this)" />
+                        <input type="text" maxlength="1" class="otp-digit" oninput="handleInput(this)" />
+                        <input type="text" maxlength="1" class="otp-digit" oninput="handleInput(this)" />
+                    </div>
+                `);
 
+                // Rest of your existing code for OTP password update
                 $.ajax({
                     url: "{{ route('update.password') }}",
                     type: 'POST',
@@ -260,206 +250,13 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     success: function(response) {
-                        if (response.status === 'success') {
-                            showToast(response.message, 'success');
-                            $('.title-otp-pw').text(response.message).removeClass(
-                                'text-danger').addClass('text-success');
-                        } else {
-                            $('.title-otp-pw').text(response.message).removeClass(
-                                'text-success').addClass('text-danger');
-                        }
-
-                        //bước gửi otp lên server
-                        $('#otpPWForm').on('submit', function(e) {
-                            e.preventDefault();
-                            var otp = '';
-                            $('#otpPWForm .otp-input').each(function() {
-                                otp += $(this).val();
-                            });
-
-                            $.ajax({
-                                url: "{{ route('update.password') }}",
-                                type: 'POST',
-                                data: {
-                                    otp: otp
-                                },
-                                headers: {
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                },
-                                success: function(response) {
-                                    if (response.status === 'success') {
-                                        showToast(response.message,
-                                            'success');
-
-                                        formOTPContent.empty();
-                                        formOTPContent.append(`
-                                                    <span class="text-center mb-1 title-otp-pw">Hãy thay đổi mật khẩu mới!</span>
-
-                                                    <div class="col-12">
-                                                        <div class="form-floating mb-3 position-relative">
-                                                            <input type="password" class="form-control" name="password" id="password" value="" placeholder="Password" required>
-                                                            <label for="password" class="form-label">Mật khẩu</label>
-                                                            <i class="fa fa-eye position-absolute top-50 end-0 translate-middle-y me-3 cursor-pointer" id="togglePassword"></i>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-12">
-                                                        <div class="form-floating mb-3 position-relative">
-                                                            <input type="password" class="form-control" name="password_confirmation" id="password_confirmation" value="" placeholder="Password" required>
-                                                            <label for="password_confirmation" class="form-label">Nhập lại mật khẩu</label>
-                                                            <i class="fa fa-eye position-absolute top-50 end-0 translate-middle-y me-3 cursor-pointer" id="togglePasswordConfirm"></i>
-                                                        </div>
-                                                    </div>
-                                                `);
-
-                                        $('#btn-send-otpPW').text(
-                                            'Lưu thay đổi');
-
-                                        $('#otpPWForm').off('submit').on(
-                                            'submit',
-                                            function(e) {
-                                                e.preventDefault();
-                                                var formData =
-                                                    new FormData(this);
-                                                formData.append('otp',
-                                                    otp);
-
-                                                const passwordInput = $(
-                                                    '#password');
-
-                                                const
-                                                    oldInvalidFeedback =
-                                                    passwordInput
-                                                    .parent().find(
-                                                        '.invalid-feedback'
-                                                        );
-                                                passwordInput
-                                                    .removeClass(
-                                                        'is-invalid');
-                                                if (oldInvalidFeedback
-                                                    .length) {
-                                                    oldInvalidFeedback
-                                                        .remove();
-                                                }
-
-                                                $.ajax({
-                                                    url: "{{ route('update.password') }}",
-                                                    type: 'POST',
-                                                    data: formData,
-                                                    processData: false,
-                                                    contentType: false,
-                                                    headers: {
-                                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                                    },
-                                                    success: function(
-                                                        response
-                                                        ) {
-                                                        if (response
-                                                            .status ===
-                                                            'success'
-                                                            ) {
-                                                            showToast
-                                                                (response
-                                                                    .message,
-                                                                    'success'
-                                                                    );
-                                                            formOTPContent
-                                                                .empty();
-                                                            $('#otpPWModal')
-                                                                .modal(
-                                                                    'hide'
-                                                                    );
-                                                        } else {
-                                                            showToast
-                                                                (response
-                                                                    .message,
-                                                                    'error'
-                                                                    );
-                                                        }
-                                                    },
-                                                    error: function(
-                                                        xhr,
-                                                        status,
-                                                        error
-                                                        ) {
-                                                        const
-                                                            response =
-                                                            xhr
-                                                            .responseJSON;
-                                                        if (response &&
-                                                            response
-                                                            .status ===
-                                                            'error'
-                                                            ) {
-                                                            if (response
-                                                                .message
-                                                                .password
-                                                                ) {
-                                                                response
-                                                                    .message
-                                                                    .password
-                                                                    .forEach(
-                                                                        error => {
-                                                                            const
-                                                                                invalidFeedback =
-                                                                                $(
-                                                                                    '<div class="invalid-feedback"></div>')
-                                                                                .text(
-                                                                                    error
-                                                                                    );
-                                                                            passwordInput
-                                                                                .addClass(
-                                                                                    'is-invalid'
-                                                                                    )
-                                                                                .parent()
-                                                                                .append(
-                                                                                    invalidFeedback
-                                                                                    );
-                                                                        }
-                                                                        );
-                                                            }
-                                                        } else {
-                                                            showToast
-                                                                ('Đã xảy ra lỗi, vui lòng thử lại.',
-                                                                    'error'
-                                                                    );
-                                                        }
-                                                    }
-                                                });
-                                            });
-
-
-                                    } else {
-                                        showToast(response.message,
-                                        'error');
-                                    }
-                                },
-                                error: function(xhr, status, error) {
-                                    const input_otp = $('#input-otp-pw');
-                                    input_otp.find('.invalid-otp').remove();
-                                    const response = xhr.responseJSON;
-
-                                    if (response && response.status ===
-                                        'error') {
-                                        if (response.message.otp) {
-                                            input_otp.append(
-                                                `<div class="invalid-otp text-danger fs-7">${response.message.otp[0]}</div>`
-                                            );
-                                        }
-                                    } else {
-                                        showToast(
-                                            'Thao tác sai, hãy thử lại',
-                                            'error');
-                                    }
-                                }
-                            });
-                        });
-
+                        // Hide spinner when response received
+                        formOTPContent.find('.spinner-border').hide();
                     },
                     error: function(xhr, status, error) {
-                        const response = xhr.responseJSON;
-                        console.log('Error1:', response);
-                        showToast('Thao tác sai, hãy thử lại', 'error');
+                        // Hide spinner and show error
+                        formOTPContent.find('.spinner-border').hide();
+                        showToast('Có lỗi xảy ra khi gửi mã OTP', 'error');
                     }
                 });
             });
@@ -485,5 +282,21 @@
                 @endif
             });
         @endif
+        
+        // Function to handle OTP input
+        function handleInput(input) {
+            let value = input.value;
+            
+            // Only allow numbers
+            input.value = value.replace(/[^0-9]/g, '');
+            
+            // Auto-move to next input
+            if (value.length === 1) {
+                let nextInput = input.nextElementSibling;
+                if (nextInput && nextInput.tagName === 'INPUT') {
+                    nextInput.focus();
+                }
+            }
+        }
     </script>
 @endpush

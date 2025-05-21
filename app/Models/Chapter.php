@@ -20,6 +20,8 @@ class Chapter extends Model
         'story_id',
         'user_id',
         'link_aff',
+        'is_free',
+        'price'
     ];
 
     public function user()
@@ -37,6 +39,29 @@ class Chapter extends Model
         return $this->belongsTo(Story::class);
     }
 
+    public function purchases()
+    {
+        return $this->hasMany(ChapterPurchase::class);
+    }
+
+    /**
+     * Check if a user has purchased this chapter
+     */
+    public function isPurchasedBy($userId)
+    {
+        if ($this->is_free) {
+            return true;
+        }
+        
+        // Check if the user has purchased the individual chapter
+        if ($this->purchases()->where('user_id', $userId)->exists()) {
+            return true;
+        }
+        
+        // Check if the user has purchased the story combo
+        return $this->story->purchases()->where('user_id', $userId)->exists();
+    }
+
     public function scopePublished($query)
     {
         return $query->where('status', 'published');
@@ -46,6 +71,4 @@ class Chapter extends Model
     {
         return $query->where('status', 'draft');
     }
-
-
 }

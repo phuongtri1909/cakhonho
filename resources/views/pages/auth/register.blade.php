@@ -70,14 +70,26 @@
                             </div>
 
                             <div class="box-button">
-                                <button type="submit" class="auth-btn btn w-100 mb-4" id="btn-send">
+                                <button type="submit" class="auth-btn btn w-100" id="btn-send">
                                     Tiếp Tục
                                 </button>
                             </div>
 
                             <div class="text-center">
+                                <div class="divider d-flex align-items-center my-4 justify-content-center">
+                                    <p class="text-center mx-3 mb-0">Hoặc</p>
+                                </div>
+
+                                <a href="{{ route('login.google') }}" class="btn w-100 mb-3 btn-outline-secondary">
+                                    <img src="{{ asset('assets/images/icons/google.svg') }}" alt="Google" class="me-2"
+                                        height="20">
+                                    Đăng nhập với Google
+                                </a>
+                            </div>
+
+                            <div class="text-center">
                                 <span>Đã có tài khoản? </span>
-                                <a href="{{ route('login') }}" class="auth-link">Đăng nhập</a>
+                                <a href="{{ route('login') }}" class="auth-link text-decoration-none">Đăng nhập</a>
                             </div>
                         </form>
                     </div>
@@ -260,7 +272,7 @@
                                                             invalidFeedback =
                                                             $(
                                                                 '<div class="invalid-feedback"></div>'
-                                                                )
+                                                            )
                                                             .text(
                                                                 error);
                                                         emailInput
@@ -285,7 +297,7 @@
                                                             invalidFeedback =
                                                             $(
                                                                 '<div class="invalid-feedback"></div>'
-                                                                )
+                                                            )
                                                             .text(
                                                                 error);
                                                         passwordInput
@@ -305,7 +317,7 @@
                                                             invalidFeedback =
                                                             $(
                                                                 '<div class="invalid-feedback"></div>'
-                                                                )
+                                                            )
                                                             .text(
                                                                 error);
                                                         nameInput
@@ -329,7 +341,7 @@
                                                             invalidFeedback =
                                                             $(
                                                                 '<div class="invalid-feedback d-block text-center"></div>'
-                                                                )
+                                                            )
                                                             .text(
                                                                 error);
                                                         $('.avatar-helper')
