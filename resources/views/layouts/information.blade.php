@@ -64,10 +64,18 @@
                         </div>
 
                         <div class="user-nav-item">
-                            <a href=""
-                                class="user-nav-link text-decoration-none hover-color-3 {{ request()->routeIs('user.reading.history') ? 'active' : '' }}">
+                            <a href="{{ route('reading.history') }}"
+                                class="user-nav-link text-decoration-none hover-color-3 {{ request()->routeIs('reading.history') ? 'active' : '' }}">
                                 <i class="fa-solid fa-book-open user-nav-icon"></i>
                                 <span class="user-nav-text">Lịch sử đọc truyện</span>
+                            </a>
+                        </div>
+                        
+                        <div class="user-nav-item">
+                            <a href="{{ route('user.purchases') }}"
+                                class="user-nav-link text-decoration-none hover-color-3 {{ request()->routeIs('user.purchases*') ? 'active' : '' }}">
+                                <i class="fa-solid fa-shopping-cart user-nav-icon"></i>
+                                <span class="user-nav-text">Truyện đã mua</span>
                             </a>
                         </div>
 

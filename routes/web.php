@@ -45,16 +45,18 @@ Route::get('/sitemap-categories.xml', [SitemapController::class, 'categories'])-
 Route::group(['middleware' => 'check.ip.ban'], function () {
     Route::middleware(['check.ban:ban_login'])->group(function () {
         Route::get('/', [HomeController::class, 'index'])->name('home');
-        Route::get('/search', [HomeController::class,'searchHeader'])->name('searchHeader');
+        Route::get('/search', [HomeController::class, 'searchHeader'])->name('searchHeader');
 
         // Route for viewing stories by category
-        Route::get('/categories-story/{slug}', [HomeController::class,'showStoryCategories'])->name('categories.story.show');
+        Route::get('/categories-story/{slug}', [HomeController::class, 'showStoryCategories'])->name('categories.story.show');
 
         Route::get('story/{slug}', [HomeController::class, 'showStory'])->middleware('affiliate.redirect:story')->name('show.page.story');
 
         Route::get('/banner/{banner}', [BannerController::class, 'click'])
-        ->middleware('affiliate.redirect:banner')
-        ->name('banner.click');
+            ->middleware('affiliate.redirect:banner')
+            ->name('banner.click');
+
+
 
         Route::middleware(['check.ban:ban_read'])->group(function () {
             Route::get('/story/{storySlug}/{chapterSlug}', [HomeController::class, 'chapterByStory'])->middleware('affiliate.redirect:chapter')->name('chapter');
@@ -67,15 +69,18 @@ Route::group(['middleware' => 'check.ip.ban'], function () {
         Route::get('/stories/{storyId}/comments', [CommentController::class, 'loadComments'])->name('comments.load');
 
         Route::get('profile', [UserController::class, 'userProfile'])->name('profile');
+        Route::get('reading-history', [UserController::class, 'readingHistory'])->name('reading.history');
+        Route::get('purchases', [UserController::class, 'userPurchases'])->name('user.purchases');
+        Route::post('reading-history/clear', [UserController::class, 'clearReadingHistory'])->name('reading.history.clear');
         Route::post('update-profile/update-name-or-phone', [UserController::class, 'updateNameOrPhone'])->name('update.name.or.phone');
         Route::post('update-avatar', [UserController::class, 'updateAvatar'])->name('update.avatar');
         Route::post('update-password', [UserController::class, 'updatePassword'])->name('update.password');
 
 
-         // Deposit Routes
-         Route::get('/deposit', [DepositController::class, 'index'])->name('user.deposit');
-         Route::post('/deposit/validate', [DepositController::class, 'validatePayment'])->name('user.deposit.validate');
-         Route::post('/deposit', [DepositController::class, 'store'])->name('user.deposit.store');
+        // Deposit Routes
+        Route::get('/deposit', [DepositController::class, 'index'])->name('user.deposit');
+        Route::post('/deposit/validate', [DepositController::class, 'validatePayment'])->name('user.deposit.validate');
+        Route::post('/deposit', [DepositController::class, 'store'])->name('user.deposit.store');
 
         Route::group(['middleware' => 'auth'], function () {
 
@@ -126,7 +131,7 @@ Route::group(['middleware' => 'check.ip.ban'], function () {
                     Route::get('comments', [CommentController::class, 'allComments'])->name('comments.all');
 
                     Route::delete('delete-comments/{comment}', [CommentController::class, 'deleteComment'])->name('delete.comments');
-                
+
                     Route::resource('banners', BannerController::class);
 
                     Route::get('logo-site', [LogoSiteController::class, 'edit'])->name('logo-site.edit');
@@ -134,7 +139,7 @@ Route::group(['middleware' => 'check.ip.ban'], function () {
 
                     Route::get('/admin/donate', [DonateController::class, 'edit'])->name('donate.edit');
                     Route::put('/admin/donate', [DonateController::class, 'update'])->name('donate.update');
-                
+
                     // Quản lý giao dịch nạp xu
                     Route::get('/deposits', [DepositController::class, 'adminIndex'])->name('deposits.index');
                     Route::post('/deposits/{deposit}/approve', [DepositController::class, 'approve'])->name('deposits.approve');

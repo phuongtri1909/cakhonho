@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redis;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
+use App\Models\UserReading;
 
 class UserController extends Controller
 {
@@ -527,5 +528,44 @@ class UserController extends Controller
                 'message' => 'Dữ liệu không hợp lệ'
             ], 422);
         }
+    }
+
+    public function readingHistory()
+    {
+        // Get user reading history from database
+        $readingHistory = UserReading::with(['story', 'chapter'])
+            ->where('user_id', Auth::id())
+            ->orderByDesc('updated_at')
+            ->get();
+
+        return view('pages.information.reading_history', compact('readingHistory'));
+    }
+
+    public function userPurchases()
+    {
+        // Get user's purchased chapters
+        $purchasedChapters = Auth::user()->chapterPurchases()
+            ->with(['chapter.story'])
+            ->orderByDesc('created_at')
+            ->get();
+            
+        // Get user's purchased story combos
+        $purchasedStories = Auth::user()->storyPurchases()
+            ->with(['story'])
+            ->orderByDesc('created_at')
+            ->get();
+            
+        return view('pages.information.purchases', compact('purchasedChapters', 'purchasedStories'));
+    }
+
+    public function clearReadingHistory()
+    {
+        // Delete all reading history for the current user
+        UserReading::where('user_id', Auth::id())->delete();
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Lịch sử đọc truyện đã được xóa'
+        ]);
     }
 }

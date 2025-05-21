@@ -48,8 +48,42 @@
                             <span class="counter" data-target="{{ $stats['ratings']['count'] }}">0</span>
                             <span>đánh giá</span>
                         </div>
-
                     </div>
+                    
+                    @php
+                        // Check if user has reading history for this story
+                        $latestReading = null;
+                        if(auth()->check()) {
+                            $latestReading = \App\Models\UserReading::where('user_id', auth()->id())
+                                ->where('story_id', $story->id)
+                                ->orderBy('updated_at', 'desc')
+                                ->first();
+                        } else {
+                            // Get device key from cookie if available
+                            $deviceKey = request()->cookie('reader_device_key');
+                            if($deviceKey) {
+                                $latestReading = \App\Models\UserReading::where('session_id', $deviceKey)
+                                    ->whereNull('user_id')
+                                    ->where('story_id', $story->id)
+                                    ->orderBy('updated_at', 'desc')
+                                    ->first();
+                            }
+                        }
+                    @endphp
+                    
+                    @if($latestReading && $latestReading->chapter)
+                        <div class="mt-3">
+                            <a href="{{ route('chapter', [$story->slug, $latestReading->chapter->slug]) }}" 
+                               class="btn btn-primary btn-sm">
+                                <i class="fas fa-book-reader me-1"></i>
+                                Tiếp tục đọc chương {{ $latestReading->chapter->number }}
+                                @if($latestReading->progress_percent > 0)
+                                    ({{ round($latestReading->progress_percent) }}%)
+                                @endif
+                            </a>
+                        </div>
+                    @endif
+                    
                     <div>
                         <div class="description-container">
                             <div class="description-content text-muted mt-4 mb-0 text-justify"

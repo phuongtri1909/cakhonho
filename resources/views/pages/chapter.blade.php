@@ -271,6 +271,64 @@
         let fontSize = localStorage.getItem('fontSize') || 18;
         let theme = localStorage.getItem('theme') || 'light';
         let isFullscreen = false;
+        
+        // Saved reading progress
+        const savedReadingProgress = {{ $readingProgress ?? 0 }};
+
+        // Function to scroll to saved reading position
+        function scrollToSavedPosition() {
+            if (savedReadingProgress > 5) {
+                const contentHeight = contentElement.scrollHeight;
+                const windowHeight = window.innerHeight;
+                const scrollDistance = ((contentHeight - windowHeight) * savedReadingProgress) / 100;
+                
+                // Smooth scroll to position with a slight delay to ensure content is loaded
+                setTimeout(() => {
+                    window.scrollTo({
+                        top: scrollDistance + contentElement.offsetTop,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Show notification about resumed position
+                    if (savedReadingProgress > 10) {
+                        showResumeNotification(savedReadingProgress);
+                    }
+                }, 500);
+            }
+        }
+        
+        // Show a notification that reading has been resumed
+        function showResumeNotification(progress) {
+            // Create toast element if it doesn't exist
+            if (!document.getElementById('resume-toast')) {
+                const toast = document.createElement('div');
+                toast.id = 'resume-toast';
+                toast.className = 'position-fixed bottom-0 end-0 m-3 p-3 bg-primary text-white rounded shadow-lg';
+                toast.style.zIndex = '9999';
+                toast.style.maxWidth = '300px';
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                toast.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-bookmark me-2"></i>
+                        <div>
+                            <p class="mb-0">Đã tiếp tục đọc từ vị trí trước (${Math.round(progress)}%)</p>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white ms-auto" onclick="this.parentElement.parentElement.style.opacity='0'"></button>
+                    </div>
+                `;
+                document.body.appendChild(toast);
+            }
+            
+            // Show the toast
+            const toast = document.getElementById('resume-toast');
+            toast.style.opacity = '1';
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 5000);
+        }
 
         // Font size controls
         function changeFontSize(delta) {
@@ -391,6 +449,9 @@
                 document.querySelectorAll('.animate__animated').forEach(el => {
                     el.style.visibility = 'visible';
                 });
+                
+                // Scroll to saved reading position
+                scrollToSavedPosition();
             }, 100);
         });
 

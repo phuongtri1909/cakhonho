@@ -14,6 +14,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Services\ReadingHistoryService;
+use App\Models\UserReading;
 
 class HomeController extends Controller
 {
@@ -393,6 +394,25 @@ class HomeController extends Controller
 
         // Lấy danh sách truyện đọc gần đây
         $recentReads = $readingService->getRecentReadings(5);
+        
+        // Retrieve reading progress if exists
+        $userReading = null;
+        if (auth()->check()) {
+            $userReading = UserReading::where('user_id', auth()->id())
+                ->where('story_id', $story->id)
+                ->where('chapter_id', $chapter->id)
+                ->first();
+        } else {
+            $deviceKey = $readingService->getOrCreateDeviceKey();
+            $userReading = UserReading::where('session_id', $deviceKey)
+                ->whereNull('user_id')
+                ->where('story_id', $story->id)
+                ->where('chapter_id', $chapter->id)
+                ->first();
+        }
+        
+        // Pass reading progress to view
+        $readingProgress = $userReading ? $userReading->progress_percent : 0;
 
         return view('pages.chapter', compact(
             'chapter',
@@ -400,7 +420,8 @@ class HomeController extends Controller
             'nextChapter',
             'prevChapter',
             'recentChapters',
-            'recentReads'
+            'recentReads',
+            'readingProgress'
         ));
     }
 
