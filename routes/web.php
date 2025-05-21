@@ -23,6 +23,7 @@ use App\Http\Controllers\LogoSiteController;
 use App\Http\Controllers\RecentlyReadController;
 use App\Http\Controllers\CommentReactionController;
 use App\Http\Controllers\Admin\BankController as AdminBankController;
+use App\Http\Controllers\Admin\ConfigController;
 use App\Http\Controllers\PurchaseController;
 
 /*
@@ -148,6 +149,9 @@ Route::group(['middleware' => 'check.ip.ban'], function () {
                     Route::group(['as' => 'admin.'], function () {
                         // Quản lý ngân hàng
                         Route::resource('banks', AdminBankController::class);
+
+                        // Quản lý cấu hình hệ thống
+                        Route::resource('configs', ConfigController::class);
                     });
                 });
             });
