@@ -22,6 +22,7 @@
                         </div>
                     </div>
                 </div>
+                <input type="hidden" id="purchase-chapter-id" value="">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
@@ -34,16 +35,12 @@
 @push('scripts')
 <script>
     // Variables to store current purchase information
-    let currentChapterId = null;
-    let currentChapterPrice = 0;
     let userCoins = {{ auth()->check() ? auth()->user()->coins : 0 }};
     
     // Function to open purchase modal
     function openPurchaseModal(chapterId, chapterTitle, chapterPrice) {
-        currentChapterId = chapterId;
-        currentChapterPrice = chapterPrice;
-        
         // Update modal content
+        document.getElementById('purchase-chapter-id').value = chapterId;
         document.getElementById('purchase-chapter-title').textContent = chapterTitle;
         document.getElementById('purchase-chapter-price').textContent = new Intl.NumberFormat().format(chapterPrice);
         document.getElementById('user-balance').textContent = new Intl.NumberFormat().format(userCoins);
@@ -67,7 +64,8 @@
     
     // Handle purchase confirmation
     document.getElementById('confirm-purchase-btn').addEventListener('click', function() {
-        if (!currentChapterId) return;
+        const chapterId = document.getElementById('purchase-chapter-id').value;
+        if (!chapterId) return;
         
         // Show loading state
         this.disabled = true;
@@ -81,7 +79,7 @@
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
             body: JSON.stringify({
-                chapter_id: currentChapterId
+                chapter_id: chapterId
             })
         })
         .then(response => response.json())
