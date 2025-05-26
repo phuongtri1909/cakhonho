@@ -9,8 +9,6 @@
         @include('components.contact_widget')
         @include('components.top_button')
     </div>
-
-    @stack('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 

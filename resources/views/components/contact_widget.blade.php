@@ -1,4 +1,5 @@
 <style>
+    /* Style cơ bản cho social icons */
     .social-icons {
         position: fixed;
         bottom: 47px;
@@ -7,6 +8,7 @@
         flex-direction: column;
         gap: 10px;
         z-index: 9999;
+        transition: all 0.5s ease;
     }
 
     .social-icon {
@@ -98,22 +100,121 @@
         100% { transform: scale(1); opacity: 0; }
     }
 
-    /* Responsive: Điều chỉnh kích thước khi màn hình nhỏ */
+    /* Mobile Toggle Button - Ẩn trên desktop */
+    .social-toggle {
+        display: none;
+    }
+
+    /* Responsive: Điều chỉnh cho mobile */
     @media (max-width: 767px) {
+        /* Đổi vị trí sang góc trái và ẩn các social icon */
         .social-icons {
             bottom: 20px;
-            right: 15px;
+            left: 15px;
+            right: auto;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            flex-direction: column-reverse; /* Hiển thị từ dưới lên */
         }
         
         .social-icon {
             width: 40px;
             height: 40px;
+            transform: scale(0);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        /* Hiển thị nút toggle trên mobile */
+        .social-toggle {
+            display: flex;
+            position: fixed;
+            bottom: 20px;
+            left: 15px;
+            width: 45px;
+            height: 45px;
+            background-color: var(--primary-color-6);
+            color: white;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            animation: bounceAttention 2s infinite;
+        }
+        
+        .social-toggle i {
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+        
+        /* Hiệu ứng nhảy nhẹ cho nút toggle */
+        @keyframes bounceAttention {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        /* Hiển thị social icons khi nút được kích hoạt */
+        .social-icons.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            bottom: 80px; /* Đẩy lên cao hơn nút toggle */
+        }
+        
+        .social-icons.show .social-icon {
+            transform: scale(1);
+        }
+        
+        /* Hiệu ứng xuất hiện tuần tự từng icon */
+        .social-icons.show .social-icon:nth-child(1) {
+            transition-delay: 0.1s;
+        }
+        
+        .social-icons.show .social-icon:nth-child(2) {
+            transition-delay: 0.2s;
+        }
+        
+        .social-icons.show .social-icon:nth-child(3) {
+            transition-delay: 0.3s;
+        }
+        
+        .social-icons.show .social-icon:nth-child(4) {
+            transition-delay: 0.4s;
+        }
+        
+        .social-icons.show .social-icon:nth-child(5) {
+            transition-delay: 0.5s;
+        }
+        
+        /* Chuyển đổi icon trong nút toggle khi mở */
+        .social-toggle.active i {
+            transform: rotate(45deg);
+        }
+        
+        /* Hiệu ứng khi mới mở lần đầu */
+        .social-icons.show .social-icon {
+            animation: popIn 0.5s forwards;
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            60% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
     }
 </style>
 
+<!-- Button toggle cho mobile -->
+<div class="social-toggle" id="socialToggle">
+    <i class="fas fa-plus"></i>
+</div>
 
-<div class="social-icons mb-3 py-3">
+<!-- Social Icons -->
+<div class="social-icons mb-3 py-3" id="socialIcons">
     @forelse($socials as $social)
         <a href="{{ $social->url }}" target="_blank" class="social-icon" aria-label="{{ $social->name }}">
             @if (strpos($social->icon, 'custom-') === 0)
@@ -131,3 +232,31 @@
         </a>
     @endforelse
 </div>
+
+<script>
+    // Toggle social icons khi nhấn nút
+    document.addEventListener('DOMContentLoaded', function() {
+        const socialToggle = document.getElementById('socialToggle');
+        const socialIcons = document.getElementById('socialIcons');
+        
+        if(socialToggle && socialIcons) {
+            socialToggle.addEventListener('click', function() {
+                socialIcons.classList.toggle('show');
+                socialToggle.classList.toggle('active');
+                
+                // Thêm hiệu ứng âm thanh nhẹ khi click (tuỳ chọn)
+                // const audio = new Audio('/path/to/pop-sound.mp3');
+                // audio.volume = 0.3;
+                // audio.play();
+            });
+            
+            // Đóng social icons khi click ra ngoài
+            document.addEventListener('click', function(e) {
+                if (!socialToggle.contains(e.target) && !socialIcons.contains(e.target) && socialIcons.classList.contains('show')) {
+                    socialIcons.classList.remove('show');
+                    socialToggle.classList.remove('active');
+                }
+            });
+        }
+    });
+</script>
