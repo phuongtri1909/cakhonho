@@ -6,7 +6,10 @@
         @php
             // Get the logo from LogoSite model
             $logoSite = \App\Models\LogoSite::first();
-            $logoPath = $logoSite && $logoSite->logo ? Storage::url($logoSite->logo) : asset('assets/images/logo/logo_site.webp');
+            $logoPath =
+                $logoSite && $logoSite->logo
+                    ? Storage::url($logoSite->logo)
+                    : asset('assets/images/logo/logo_site.webp');
         @endphp
         <a class="d-flex m-0 justify-content-center text-wrap" href="{{ route('home') }}">
             <img height="70" class="logo_site" src="{{ $logoPath }}" alt="{{ config('app.name') }} logo">
@@ -64,7 +67,7 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link {{ Route::currentRouteNamed('stories.*','stories.chapters.*') ? 'active' : '' }}"
+                <a class="nav-link {{ Route::currentRouteNamed('stories.*', 'stories.chapters.*') ? 'active' : '' }}"
                     href="{{ route('stories.index') }}">
                     <div
                         class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
@@ -85,16 +88,7 @@
                 </a>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link {{ Route::currentRouteNamed('logo-site.*') ? 'active' : '' }}"
-                    href="{{ route('logo-site.edit') }}">
-                    <div
-                        class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="fa-regular fa-images text-dark icon-sidebar"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Logo</span>
-                </a>
-            </li>
+
 
             <li class="nav-item">
                 <a class="nav-link {{ Route::currentRouteNamed('deposits.*') ? 'active' : '' }}"
@@ -163,6 +157,28 @@
                         <i class="fa-solid fa-gears text-dark icon-sidebar"></i>
                     </div>
                     <span class="nav-link-text ms-1">Cấu hình hệ thống</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ Route::currentRouteNamed('admin.socials.*') ? 'active' : '' }}"
+                    href="{{ route('admin.socials.index') }}">
+                    <div
+                        class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fa-solid fa-share-nodes text-dark icon-sidebar"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Socials</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ Route::currentRouteNamed('logo-site.*') ? 'active' : '' }}"
+                    href="{{ route('logo-site.edit') }}">
+                    <div
+                        class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fa-regular fa-images text-dark icon-sidebar"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Logo</span>
                 </a>
             </li>
 

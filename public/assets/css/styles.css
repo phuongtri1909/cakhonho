@@ -4,7 +4,7 @@
     --primary-color-3: #d1bb61;
     --primary-color-4: #cdedff;
     --primary-color-5: #cdedff;
-    --primary-color-6: #cdedff;
+    --primary-color-6: #f6ca18;
     --purple-color-1: #cdedff;
     --purple-color-2: #cdedff;
     --bg-list: #fafafa;
@@ -1251,3 +1251,18 @@ body {
 .hover-cl-53e09f:hover{
     color: #53e09f !important;
 }
+
+.custom-zalo {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/50px-Icon_of_Zalo.svg.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    vertical-align: -0.125em;
+}
+
+.social-icon .custom-zalo {
+    font-size: 1.2em;
+} 

@@ -6,6 +6,7 @@
         @include('components.toast-main')
         
         @yield('content')
+        @include('components.contact_widget')
         @include('components.top_button')
     </div>
 

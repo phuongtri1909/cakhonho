@@ -20,11 +20,12 @@ use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SocialsController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LogoSiteController;
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\Admin\ConfigController;
+use App\Http\Controllers\Admin\SocialController;
 use App\Http\Controllers\RecentlyReadController;
 use App\Http\Controllers\CommentReactionController;
 use App\Http\Controllers\Admin\BankController as AdminBankController;
-use App\Http\Controllers\Admin\ConfigController;
-use App\Http\Controllers\PurchaseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -146,12 +147,20 @@ Route::group(['middleware' => 'check.ip.ban'], function () {
                     Route::post('/deposits/{deposit}/approve', [DepositController::class, 'approve'])->name('deposits.approve');
                     Route::post('/deposits/{deposit}/reject', [DepositController::class, 'reject'])->name('deposits.reject');
 
+
+
+
                     Route::group(['as' => 'admin.'], function () {
                         // Quản lý ngân hàng
                         Route::resource('banks', AdminBankController::class);
 
                         // Quản lý cấu hình hệ thống
                         Route::resource('configs', ConfigController::class);
+
+                        Route::get('socials', [SocialController::class, 'index'])->name('socials.index');
+                        Route::post('socials', [SocialController::class, 'store'])->name('socials.store');
+                        Route::put('socials/{social}', [SocialController::class, 'update'])->name('socials.update');
+                        Route::delete('socials/{social}', [SocialController::class, 'destroy'])->name('socials.destroy');
                     });
                 });
             });
