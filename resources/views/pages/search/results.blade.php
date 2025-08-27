@@ -76,7 +76,7 @@
                                         </div>
                                     </div>
                                     <div class="story-description mt-2 small text-muted d-none d-md-block">
-                                        {!! Str::limit($story->description, 150) !!}
+                                         {{ cleanDescription($story->description, 150) }}
                                     </div>
                                 </div>
                             </div>
@@ -96,10 +96,10 @@
                     @include('components.recent-reads')
                 </div>
                 <div class="mb-4">
-                    <x-categories-widget 
-                        :categories="$categories" 
-                        :current-category="$currentCategory ?? null" 
-                        :is-search="$isSearch ?? false" 
+                    <x-categories-widget
+                        :categories="$categories"
+                        :current-category="$currentCategory ?? null"
+                        :is-search="$isSearch ?? false"
                     />
                 </div>
             </div>
