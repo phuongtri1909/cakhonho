@@ -37,38 +37,32 @@ class LogoSiteController extends Controller
     public function update(Request $request)
     {
         $validatedData = $request->validate([
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'favicon' => 'nullable|image|mimes:jpeg,png,jpg,gif,ico|max:1024',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'favicon' => 'nullable|file|mimes:ico,x-icon|max:1024',
+        ], [
+            'favicon.mimes' => 'Favicon phải là file .ico',
         ]);
         
-        // Get existing record or create new
         $logoSite = LogoSite::first();
         if (!$logoSite) {
             $logoSite = new LogoSite();
         }
         
-        // Handle logo upload
         if ($request->hasFile('logo')) {
-            // Delete old logo if exists
             if ($logoSite->logo) {
                 Storage::delete('public/' . $logoSite->logo);
             }
             
-            // Process and save new logo
             $logoPath = $this->processLogo($request->file('logo'));
             $logoSite->logo = $logoPath;
         }
         
-        // Handle favicon upload
         if ($request->hasFile('favicon')) {
-            // Delete old favicon if exists
-            if ($logoSite->favicon) {
-                Storage::delete('public/' . $logoSite->favicon);
-            }
+            $faviconFile = $request->file('favicon');
             
-            // Process and save new favicon
-            $faviconPath = $this->processFavicon($request->file('favicon'));
-            $logoSite->favicon = $faviconPath;
+            $faviconFile->move(public_path(), 'favicon.ico');
+            
+            $logoSite->favicon = 'favicon.ico';
         }
         
         $logoSite->save();
@@ -86,7 +80,7 @@ class LogoSiteController extends Controller
             Storage::makeDirectory('public/logos');
         }
         
-        $filename = 'site_logo_' . time() . '.webp';
+        $filename = 'site_site_' . time() . '.webp';
         $path = 'logos/' . $filename;
         
         // Resize height to 50px and maintain aspect ratio
@@ -99,26 +93,4 @@ class LogoSiteController extends Controller
         return $path;
     }
     
-    /**
-     * Process and optimize the uploaded favicon
-     */
-    private function processFavicon($image)
-    {
-        // Create directory if not exists
-        if (!Storage::exists('public/logos')) {
-            Storage::makeDirectory('public/logos');
-        }
-        
-        $filename = 'favicon_' . time() . '.webp';
-        $path = 'logos/' . $filename;
-        
-        // Resize to standard favicon size (32x32)
-        $img = Image::make($image->getRealPath())
-            ->resize(32, 32)
-            ->encode('webp', 90); // Convert to WebP with 90% quality
-        
-        Storage::put('public/' . $path, $img);
-        
-        return $path;
-    }
 }

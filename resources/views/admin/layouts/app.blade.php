@@ -8,12 +8,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     @php
-        // Get the logo and favicon from LogoSite model
         $logoSite = \App\Models\LogoSite::first();
-        $faviconPath = $logoSite && $logoSite->favicon ? Storage::url($logoSite->favicon) : asset('assets/images/logo/favicon.ico');
     @endphp
 
-    <link rel="icon" type="image/png" href="{{ $faviconPath }}">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.ico') }}">
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@100;200;300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">

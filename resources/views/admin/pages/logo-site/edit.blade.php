@@ -54,33 +54,36 @@
                                 </div>
                                 <div class="card-body p-3">
                                     <div class="form-group">
-                                        <label for="favicon" class="form-control-label">Tệp Favicon</label>
+                                        <label for="favicon" class="form-control-label">Tệp Favicon <span class="text-danger">*</span></label>
                                         <input type="file" class="form-control @error('favicon') is-invalid @enderror" 
-                                               name="favicon" id="favicon" accept="image/*,image/x-icon">
+                                               name="favicon" id="favicon" accept=".ico,image/x-icon">
                                         <small class="form-text text-muted">
-                                            Favicon sẽ được điều chỉnh về kích thước 32x32px và chuyển đổi thành định dạng WebP.
-                                            Đề xuất dùng hình ảnh vuông.
+                                            <strong>Bắt buộc file .ico</strong> - File sẽ được lưu trực tiếp vào public/favicon.ico
                                         </small>
                                         @error('favicon')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
                                     
-                                    @if(isset($logoSite) && $logoSite->favicon)
+                                    @if(file_exists(public_path('favicon.ico')))
                                         <div class="mt-3 mb-4 text-center p-3 bg-light rounded">
                                             <p>Favicon hiện tại:</p>
-                                            <div style="width: 32px; height: 32px; display: inline-block; border: 1px solid #ddd;">
-                                                <img src="{{ Storage::url($logoSite->favicon) }}" alt="Favicon" class="img-fluid">
+                                            <div style="width: 32px; height: 32px; display: inline-block; border: 1px solid #ddd; background: white;">
+                                                <img src="{{ asset('favicon.ico') }}?v={{ time() }}" alt="Favicon" class="img-fluid">
                                             </div>
                                             <div class="mt-2">
                                                 <small>Hiển thị kích thước thực</small>
                                             </div>
                                             <div class="mt-3">
-                                                <img src="{{ Storage::url($logoSite->favicon) }}" alt="Favicon" style="width: 64px; height: 64px;">
+                                                <img src="{{ asset('favicon.ico') }}?v={{ time() }}" alt="Favicon" style="width: 64px; height: 64px; image-rendering: pixelated;">
                                                 <div>
                                                     <small>Phóng to 2x</small>
                                                 </div>
                                             </div>
+                                        </div>
+                                    @else
+                                        <div class="mt-3 mb-4 text-center p-3 bg-light rounded">
+                                            <p class="text-muted">Chưa có favicon</p>
                                         </div>
                                     @endif
                                 </div>
