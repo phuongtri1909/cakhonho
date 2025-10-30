@@ -381,7 +381,7 @@
                         @endforeach
 
                         <div class="d-flex justify-content-center mt-4">
-                            {{ $deposits->links() }}
+                            <x-pagination :paginator="$deposits" />
                         </div>
                     @else
                         <div class="empty-transactions">

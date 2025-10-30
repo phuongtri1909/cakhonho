@@ -123,7 +123,7 @@
                         @endforeach
                         
                         <div class="mt-4">
-                            {{ $comments->appends(request()->query())->links() }}
+                            <x-pagination :paginator="$comments" />
                         </div>
                     @else
                         <div class="alert alert-info text-center">

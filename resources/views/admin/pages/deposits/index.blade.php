@@ -85,7 +85,7 @@
                                         <td>
                                             <div class="d-flex">
                                                 <div>
-                                                    <img src="{{ $deposit->user->avatar ? asset('storage/' . $deposit->user->avatar) : asset('assets/img/default-avatar.png') }}" 
+                                                    <img src="{{ $deposit->user->avatar ? asset('storage/' . $deposit->user->avatar) : asset('assets/images/avatar_default.jpg') }}" 
                                                          class="avatar avatar-sm me-2" alt="user image">
                                                 </div>
                                                 <div class="d-flex flex-column justify-content-center">
@@ -176,7 +176,7 @@
                         </table>
                     </div>
                     <div class="px-4 pt-4">
-                        {{ $deposits->withQueryString()->links() }}
+                        <x-pagination :paginator="$deposits" />
                     </div>
                 </div>
             </div>
