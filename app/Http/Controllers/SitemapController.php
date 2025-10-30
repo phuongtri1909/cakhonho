@@ -54,12 +54,6 @@ class SitemapController extends Controller
                 'priority' => '1.0'
             ],
             [
-                'loc' => route('contact'),
-                'lastmod' => Carbon::now()->toAtomString(),
-                'changefreq' => 'monthly',
-                'priority' => '0.5'
-            ],
-            [
                 'loc' => route('login'),
                 'lastmod' => Carbon::now()->toAtomString(),
                 'changefreq' => 'monthly',
@@ -92,7 +86,6 @@ class SitemapController extends Controller
 
     public function chapters()
     {
-        // Using pagination for large datasets
         $chapters = Chapter::where('status', 'published')
             ->select('id', 'story_id', 'slug', 'updated_at')
             ->with(['story:id,slug'])
