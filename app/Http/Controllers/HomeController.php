@@ -118,11 +118,11 @@ class HomeController extends Controller
     {
         $query = Story::with(['chapters' => function ($query) {
             $query->select('id', 'story_id', 'views', 'created_at')
-                ->where('status', 'published'); // Chỉ lấy chương đã xuất bản
+                ->where('status', 'published'); 
         }])
             ->published()
             ->whereHas('chapters', function ($query) {
-                $query->where('status', 'published'); // Chỉ lấy truyện có chương đã xuất bản
+                $query->where('status', 'published');
             })
             ->select([
                 'id',
@@ -136,8 +136,7 @@ class HomeController extends Controller
             ])
             ->withCount(['chapters' => function ($query) {
                 $query->where('status', 'published');
-            }])
-            ->where('updated_at', '>=', now()->subDays(30));
+            }]);
 
         // Apply category filter if selected
         if ($request->category_id) {
@@ -152,6 +151,7 @@ class HomeController extends Controller
                 return $story;
             })
             ->sortByDesc('hot_score')
+            ->values()
             ->take(12);
         return $hotStories;
     }
