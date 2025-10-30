@@ -13,21 +13,19 @@ use Illuminate\Support\Str;
 class ReadingHistoryService
 {
     /**
-     * Lưu tiến độ đọc của người dùng
+     * Save reading progress for user
      */
     public function saveReadingProgress(Story $story, Chapter $chapter, $progressPercent = 0)
     {
         if (Auth::check()) {
-            // Người dùng đã đăng nhập, lưu vào database
             return $this->saveUserReadingProgress(Auth::id(), $story->id, $chapter->id, $progressPercent);
         } else {
-            // Người dùng chưa đăng nhập, lưu vào session
             return $this->saveSessionReadingProgress($story->id, $chapter->id, $progressPercent);
         }
     }
     
     /**
-     * Lưu tiến độ đọc vào database cho người dùng đã đăng nhập
+     * Save reading progress to database for logged in user
      */
     private function saveUserReadingProgress($userId, $storyId, $chapterId, $progressPercent)
     {
@@ -45,14 +43,12 @@ class ReadingHistoryService
     }
     
     /**
-     * Lưu tiến độ đọc vào session cho người dùng chưa đăng nhập
+     * Save reading progress to session for logged out user
      */
     private function saveSessionReadingProgress($storyId, $chapterId, $progressPercent)
     {
-        // Lấy hoặc tạo key đại diện cho thiết bị người dùng
         $deviceKey = $this->getOrCreateDeviceKey();
         
-        // Lưu vào database với device_key
         return UserReading::updateOrCreate(
             [
                 'session_id' => $deviceKey,
@@ -68,52 +64,44 @@ class ReadingHistoryService
     }
     
     /**
-     * Lấy hoặc tạo key đại diện cho thiết bị người dùng
-     * Key này được lưu trong cookie và ổn định ngay cả khi đăng nhập/đăng xuất
+     * Get or create device key for user
+     * Key is stored in cookie and stable even when logged in/out
      */
     public function getOrCreateDeviceKey()
     {
         $cookieName = 'reader_device_key';
         
-        // Kiểm tra xem đã có cookie chứa device key chưa
         if (!Cookie::has($cookieName) && !request()->cookie($cookieName)) {
-            // Tạo một device key mới
             $deviceKey = 'device_' . Str::uuid()->toString();
             
-            // Lưu device key vào cookie, thời hạn 1 năm
             Cookie::queue($cookieName, $deviceKey, 525600);
             
-            // Cũng lưu vào session để sử dụng ngay trong request hiện tại
             Session::put($cookieName, $deviceKey);
             
             return $deviceKey;
         }
         
-        // Lấy từ cookie hoặc từ session nếu cookie chưa có sẵn trong request hiện tại
         $deviceKey = request()->cookie($cookieName) ?? Session::get($cookieName);
         
-        // Lưu vào session để đảm bảo có thể sử dụng trong request hiện tại
         Session::put($cookieName, $deviceKey);
         
         return $deviceKey;
     }
     
     /**
-     * Lấy danh sách 5 truyện đọc gần đây
+     * Get list of 5 recent readings
      */
     public function getRecentReadings($limit = 5)
     {
         if (Auth::check()) {
-            // Người dùng đã đăng nhập
             return $this->getUserRecentReadings(Auth::id(), $limit);
         } else {
-            // Người dùng chưa đăng nhập
             return $this->getSessionRecentReadings($limit);
         }
     }
     
     /**
-     * Lấy truyện đọc gần đây của người dùng đã đăng nhập
+        * Get recent readings for logged in user
      */
     private function getUserRecentReadings($userId, $limit)
     {
@@ -125,7 +113,7 @@ class ReadingHistoryService
     }
     
     /**
-     * Lấy truyện đọc gần đây từ session
+     * Get recent readings from session
      */
     private function getSessionRecentReadings($limit)
     {
@@ -140,11 +128,10 @@ class ReadingHistoryService
     }
     
     /**
-     * Chuyển dữ liệu đọc từ session sang user khi đăng nhập
+     * Migrate reading data from session to user when logging in
      */
     public function migrateSessionReadingsToUser($userId)
     {
-        // Sử dụng device key thay vì session key
         $deviceKey = $this->getOrCreateDeviceKey();
         
         $sessionReadings = UserReading::where('session_id', $deviceKey)
@@ -152,12 +139,10 @@ class ReadingHistoryService
             ->get();
         
         foreach ($sessionReadings as $reading) {
-            // Kiểm tra xem người dùng đã có bản ghi cho truyện này chưa
             $userReading = UserReading::where('user_id', $userId)
                 ->where('story_id', $reading->story_id)
                 ->first();
                 
-            // Nếu người dùng chưa đọc truyện này hoặc đọc truyện này nhưng cũ hơn
             if (!$userReading || $reading->updated_at > $userReading->updated_at) {
                 UserReading::updateOrCreate(
                     [
@@ -172,34 +157,26 @@ class ReadingHistoryService
                 );
             }
             
-            // Xóa bản ghi session sau khi đã chuyển dữ liệu
             $reading->delete();
         }
     }
     
     /**
-     * Sao chép dữ liệu đọc của người dùng sang session khi đăng xuất
-     *
-     * @param int $userId ID của người dùng đang đăng xuất
-     * @return void
+     * Copy user reading data to session when logging out
      */
     public function copyUserReadingsToSession($userId)
     {
-        // Sử dụng device key thay vì session key
         $deviceKey = $this->getOrCreateDeviceKey();
         
-        // Lấy các bản ghi đọc của người dùng
         $userReadings = UserReading::where('user_id', $userId)
             ->orderByDesc('updated_at')
-            ->take(10)  // Tăng lên 10 bản ghi để lưu nhiều truyện hơn
+            ->take(10)
             ->get();
         
-        // Xóa các bản ghi session cũ (nếu có)
         UserReading::where('session_id', $deviceKey)
             ->whereNull('user_id')
             ->delete();
         
-        // Sao chép các bản ghi từ user vào session
         foreach ($userReadings as $reading) {
             UserReading::create([
                 'session_id' => $deviceKey,
@@ -214,11 +191,8 @@ class ReadingHistoryService
     }
     
     /**
-     * Xóa các bản ghi session cũ
-     * Nên chạy định kỳ để dọn dẹp DB
-     *
-     * @param int $days Số ngày để coi là cũ
-     * @return int Số bản ghi đã xóa
+     * Delete old session readings
+     * Should be run periodically to clean up DB
      */
     public function cleanupOldSessionReadings($days = 30)
     {

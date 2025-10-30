@@ -23,6 +23,8 @@ class Story extends Model
         'has_combo'
     ];
 
+    const STATUS_DRAFT = 'draft';
+    const STATUS_PUBLISHED = 'published';
 
     public function banners()
     {
@@ -65,12 +67,12 @@ class Story extends Model
 
     public function scopePublished($query)
     {
-        return $query->where('status', 'published');
+        return $query->where('status', self::STATUS_PUBLISHED);
     }
 
     public function scopeDraft($query)
     {
-        return $query->where('status', 'draft');
+        return $query->where('status', self::STATUS_DRAFT);
     }
 
     public function scopePopular($query)
@@ -97,7 +99,7 @@ class Story extends Model
     public function latestChapter()
     {
         return $this->hasOne(Chapter::class)
-            ->where('status', 'published')
+            ->where('status', self::STATUS_PUBLISHED)
             ->orderByDesc('number');
     }
 

@@ -11,29 +11,24 @@ use Intervention\Image\Facades\Image;
 class BannerController extends Controller
 {
 
-
-
     /**
-     * Handle banner click and redirect
+     * Handle banner click and redirect to story page or external link
      */
     public function click(Request $request, Banner $banner)
     {
-        // Check if banner has a story
         if ($banner->story_id) {
-            // If banner has a story, redirect to story page
-            $story = Story::find($banner->story_id);
+            $story = Story::where('id', $banner->story_id)
+                ->where('status', Story::STATUS_PUBLISHED)
+                ->first();
             if ($story) {
                 return redirect()->route('show.page.story', $story->slug);
             }
         }
 
-        // If no story or story not found, use the banner link
         if (!empty($banner->link)) {
-            // Direct redirect to external link
             return redirect()->away($banner->link);
         }
 
-        // Fallback to homepage if neither exists
         return redirect()->route('home');
     }
 
@@ -62,12 +57,10 @@ class BannerController extends Controller
     {
         $validatedData = $this->validateBanner($request);
 
-        // Handle image upload
         if ($request->hasFile('image')) {
             $validatedData['image'] = $this->processImage($request->file('image'));
         }
 
-        // Handle link requirement based on story_id
         if (empty($validatedData['story_id']) && empty($validatedData['link'])) {
             return back()->withInput()->withErrors(['link' => 'Link là bắt buộc khi không chọn truyện']);
         }
@@ -172,7 +165,6 @@ class BannerController extends Controller
             Storage::disk('public')->makeDirectory($dir);
         }
 
-        // Desktop version
         $desktopImg = Image::make($image->getRealPath())
             ->resize(1920, null, function ($constraint) {
                 $constraint->aspectRatio();

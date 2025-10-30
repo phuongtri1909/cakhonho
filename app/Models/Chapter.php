@@ -24,6 +24,9 @@ class Chapter extends Model
         'price'
     ];
 
+    const STATUS_DRAFT = 'draft';
+    const STATUS_PUBLISHED = 'published';
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -53,22 +56,20 @@ class Chapter extends Model
             return true;
         }
         
-        // Check if the user has purchased the individual chapter
         if ($this->purchases()->where('user_id', $userId)->exists()) {
             return true;
         }
         
-        // Check if the user has purchased the story combo
         return $this->story->purchases()->where('user_id', $userId)->exists();
     }
 
     public function scopePublished($query)
     {
-        return $query->where('status', 'published');
+        return $query->where('status', self::STATUS_PUBLISHED);
     }
 
     public function scopeDraft($query)
     {
-        return $query->where('status', 'draft');
+        return $query->where('status', self::STATUS_DRAFT);
     }
 }
