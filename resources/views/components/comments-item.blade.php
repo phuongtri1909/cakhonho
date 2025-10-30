@@ -4,7 +4,7 @@
 @endphp
 
 <li class="clearfix d-flex {{ $isPinned ? 'pinned-comment' : '' }}" id="comment-{{ $comment->id }}">
-    <img src="{{ $comment->user && $comment->user->avatar ? asset($comment->user->avatar) : asset('assets/images/avatar_default.jpg') }}"
+    <img src="{{ $comment->user && $comment->user->avatar ? Storage::url($comment->user->avatar) : asset('assets/images/avatar_default.jpg') }}"
         class="{{ $level > 0 ? 'avatar-reply' : 'avatar' }}"
         alt="{{ $comment->user ? $comment->user->name : 'Người dùng không tồn tại' }}">
     <div class="post-comments p-2 p-md-3">

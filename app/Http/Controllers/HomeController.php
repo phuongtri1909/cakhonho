@@ -13,6 +13,7 @@ use App\Models\Socials;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use App\Services\ReadingHistoryService;
 use App\Models\UserReading;
 
@@ -45,48 +46,46 @@ class HomeController extends Controller
             ->with(['categories', 'chapters'])
             ->paginate(20);
 
+        $categories = Category::select('id','name','slug')->orderBy('name')->get();
+
         return view('pages.search.results', [
             'stories' => $stories,
             'query' => $query,
-            'isSearch' => true
+            'isSearch' => true,
+            'categories' => $categories,
         ]);
     }
 
     public function showStoryCategories($slug)
     {
-
         $category = Category::where('slug', $slug)->firstOrFail();
         
         $stories = $category->stories()
             ->published()
             ->with(['categories', 'chapters'])
             ->paginate(20);
+        
+        $categories = Category::select('id','name','slug')->orderBy('name')->get();
             
         return view('pages.search.results', [
             'stories' => $stories,
             'currentCategory' => $category,
-            'isSearch' => false
+            'isSearch' => false,
+            'categories' => $categories,
         ]);
     }
 
     public function index(Request $request)
     {
-
-        // Get banners
         $banners = Banner::active()->get();
-
-        // Get hot stories
+        $categories = Category::select('id','name','slug')->orderBy('name')->get();
         $hotStories = $this->getHotStories($request);
-
-        // Get new stories
         $newStories = $this->getNewStories($request);
-
-        // Get completed stories
-        $completedStories = Story::with(['categories'])
+        $completedStories = Story::query()
             ->published()
             ->where('completed', true)
             ->whereHas('chapters', function ($query) {
-                $query->where('status', 'published'); // Chỉ lấy truyện có chương đã xuất bản
+                $query->where('status', 'published');
             })
             ->select([
                 'id',
@@ -97,7 +96,7 @@ class HomeController extends Controller
                 'updated_at'
             ])
             ->withCount(['chapters' => function ($query) {
-                $query->where('status', 'published'); // Chỉ đếm chương đã xuất bản
+                $query->where('status', 'published');
             }])
             ->latest('updated_at')
             ->take(18)
@@ -115,15 +114,120 @@ class HomeController extends Controller
             }
         }
 
-        return view('pages.home', compact('hotStories', 'newStories', 'completedStories', 'banners'));
+        $dailyHotStories = Story::query()
+            ->where('stories.status', Story::STATUS_PUBLISHED)
+            ->join('chapters', function($join){
+                $join->on('stories.id', '=', 'chapters.story_id')
+                     ->where('chapters.status', 'published')
+                     ->where('chapters.updated_at', '>=', now()->subDay());
+            })
+            ->leftJoin(DB::raw('(SELECT story_id, rating FROM ratings WHERE created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)) as recent_ratings'), 'stories.id', '=', 'recent_ratings.story_id')
+            ->select('stories.id')
+            ->groupBy('stories.id')
+            ->orderByRaw('(SUM(chapters.views) * AVG(COALESCE(recent_ratings.rating, 3))) DESC')
+            ->take(10)
+            ->pluck('stories.id');
+        if ($dailyHotStories->isEmpty()) {
+            $dailyHotStories = Story::query()
+                ->where('stories.status', Story::STATUS_PUBLISHED)
+                ->whereHas('chapters', fn($q)=>$q->where('status','published'))
+                ->latest('updated_at')
+                ->take(10)
+                ->pluck('stories.id');
+        }
+
+        $weeklyHotStories = Story::query()
+            ->where('stories.status', Story::STATUS_PUBLISHED)
+            ->join('chapters', function($join){
+                $join->on('stories.id', '=', 'chapters.story_id')
+                     ->where('chapters.status', 'published')
+                     ->where('chapters.updated_at', '>=', now()->subDays(7));
+            })
+            ->leftJoin(DB::raw('(SELECT story_id, rating FROM ratings WHERE created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)) as recent_ratings'), 'stories.id', '=', 'recent_ratings.story_id')
+            ->select('stories.id')
+            ->groupBy('stories.id')
+            ->orderByRaw('(SUM(chapters.views) * AVG(COALESCE(recent_ratings.rating, 3))) DESC')
+            ->take(10)
+            ->pluck('stories.id');
+        if ($weeklyHotStories->isEmpty()) {
+            $weeklyHotStories = Story::query()
+                ->where('stories.status', Story::STATUS_PUBLISHED)
+                ->whereHas('chapters', fn($q)=>$q->where('status','published'))
+                ->latest('updated_at')
+                ->take(10)
+                ->pluck('stories.id');
+        }
+
+        $monthlyHotStories = Story::query()
+            ->where('stories.status', Story::STATUS_PUBLISHED)
+            ->join('chapters', function($join){
+                $join->on('stories.id', '=', 'chapters.story_id')
+                     ->where('chapters.status', 'published')
+                     ->where('chapters.updated_at', '>=', now()->subDays(30));
+            })
+            ->leftJoin(DB::raw('(SELECT story_id, rating FROM ratings WHERE created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)) as recent_ratings'), 'stories.id', '=', 'recent_ratings.story_id')
+            ->select('stories.id')
+            ->groupBy('stories.id')
+            ->orderByRaw('(SUM(chapters.views) * AVG(COALESCE(recent_ratings.rating, 3))) DESC')
+            ->take(10)
+            ->pluck('stories.id');
+        if ($monthlyHotStories->isEmpty()) {
+            $monthlyHotStories = Story::query()
+                ->where('stories.status', Story::STATUS_PUBLISHED)
+                ->whereHas('chapters', fn($q)=>$q->where('status','published'))
+                ->latest('updated_at')
+                ->take(10)
+                ->pluck('stories.id');
+        }
+
+        $allIds = $dailyHotStories->pluck('id')
+            ->merge($weeklyHotStories->pluck('id'))
+            ->merge($monthlyHotStories->pluck('id'))
+            ->merge(collect($hotStories)->pluck('id'))
+            ->merge(collect($newStories)->pluck('id'))
+            ->merge(collect($completedStories)->pluck('id'))
+            ->unique()
+            ->values();
+
+        if ($allIds->isNotEmpty()) {
+            $hydrated = Story::with([
+                'categories:id,name,slug',
+                'latestChapter' => function($q){
+                    $q->select('chapters.id','chapters.story_id','chapters.title','chapters.slug','chapters.number','chapters.created_at','chapters.status')
+                      ->where('status', Chapter::STATUS_PUBLISHED);
+                }
+            ])->whereIn('id', $allIds)->get()->keyBy('id');
+
+            $dailyHotStories = collect($dailyHotStories)->map(fn($id) => $hydrated->get($id))->filter();
+            $weeklyHotStories = collect($weeklyHotStories)->map(fn($id) => $hydrated->get($id))->filter();
+            $monthlyHotStories = collect($monthlyHotStories)->map(fn($id) => $hydrated->get($id))->filter();
+
+            if ($hotStories instanceof \Illuminate\Support\Collection) {
+                $hotStories = $hotStories->map(fn($s) => $hydrated->get($s->id) ?? $s);
+            }
+            if ($newStories instanceof \Illuminate\Support\Collection) {
+                $newStories = $newStories->map(fn($s) => $hydrated->get($s->id) ?? $s);
+            }
+            if ($completedStories instanceof \Illuminate\Support\Collection) {
+                $completedStories = $completedStories->map(fn($s) => $hydrated->get($s->id) ?? $s);
+            }
+        }
+
+        return view('pages.home', compact(
+            'categories',
+            'hotStories',
+            'newStories',
+            'completedStories',
+            'banners',
+            'dailyHotStories',
+            'weeklyHotStories',
+            'monthlyHotStories'
+        ));
     }
 
     private function getHotStories($request)
     {
-        $query = Story::with(['chapters' => function ($query) {
-            $query->select('id', 'story_id', 'views', 'created_at')
-                ->where('status', 'published'); 
-        }])
+        $query = Story::query()
             ->published()
             ->whereHas('chapters', function ($query) {
                 $query->where('status', 'published');
@@ -140,7 +244,14 @@ class HomeController extends Controller
             ])
             ->withCount(['chapters' => function ($query) {
                 $query->where('status', 'published');
-            }]);
+            }])
+            ->withSum(['chapters as recent_views' => function ($q) {
+                $q->where('status', 'published')
+                  ->where('created_at', '>=', now()->subDays(7));
+            }], 'views')
+            ->withSum(['chapters as total_views' => function ($q) {
+                $q->where('status', 'published');
+            }], 'views');
 
         if ($request->category_id) {
             $query->whereHas('categories', function ($q) use ($request) {
@@ -161,18 +272,14 @@ class HomeController extends Controller
 
     private function calculateHotScore($story)
     {
-        $totalViews = $story->chapters->sum('views');
+        $totalViews = (int) ($story->total_views ?? 0);
+        $recentViews = (int) ($story->recent_views ?? 0);
+        $chaptersCount = (int) ($story->chapters_count ?? 0);
 
-        $avgViews = $story->chapters_count > 0 ?
-            $totalViews / $story->chapters_count : 0;
-
-        $recentViews = $story->chapters()
-            ->where('status', 'published')
-            ->where('created_at', '>=', now()->subDays(7))
-            ->sum('views');
+        $avgViews = $chaptersCount > 0 ? ($totalViews / $chaptersCount) : 0;
 
         $daysActive = max(1, $story->created_at->diffInDays(now()));
-        $chapterFrequency = $story->chapters_count / $daysActive;
+        $chapterFrequency = $chaptersCount / $daysActive;
 
         $daysSinceLastUpdate = $story->updated_at->diffInDays(now());
         $recencyBoost = 1 + (1 / max(1, $daysSinceLastUpdate));
@@ -182,7 +289,7 @@ class HomeController extends Controller
             ($avgViews * 0.2) +
             ($recentViews * 0.25) +
             ($chapterFrequency * 15) +
-            ($story->chapters_count * 5)
+            ($chaptersCount * 5)
         ) * $recencyBoost;
 
         return $score;
@@ -190,10 +297,7 @@ class HomeController extends Controller
 
     private function getNewStories($request)
     {
-        $query = Story::with(['latestChapter' => function ($query) {
-            $query->select('id', 'story_id', 'title', 'slug', 'number', 'views', 'created_at', 'status')
-                ->where('status', 'published');
-        }, 'categories'])
+        $query = Story::query()
             ->published()
             ->select([
                 'id',
@@ -224,13 +328,17 @@ class HomeController extends Controller
             ->take(20)
             ->get();
     }
+
     public function showStory(Request $request, $slug)
     {
-        $storyQuery = Story::where('slug', $slug);
-        if (!auth()->check() || !in_array(auth()->user()->role, ['admin', 'mod'])) {
-            $storyQuery->where('status', Story::STATUS_PUBLISHED);
+        $story = $request->attributes->get('story');
+        if (!$story || $story->slug !== $slug) {
+            $storyQuery = Story::where('slug', $slug);
+            if (!auth()->check() || !in_array(auth()->user()->role, ['admin', 'mod'])) {
+                $storyQuery->where('status', Story::STATUS_PUBLISHED);
+            }
+            $story = $storyQuery->firstOrFail();
         }
-        $story = $storyQuery->firstOrFail();
 
         $story->load(['categories']);
 
@@ -240,7 +348,7 @@ class HomeController extends Controller
             ->paginate(20);
 
         $stats = [
-            'total_chapters' => $story->chapters()->published()->count(),
+            'total_chapters' => method_exists($chapters, 'total') ? $chapters->total() : $story->chapters()->published()->count(),
             'total_views' => $story->chapters()->sum('views'),
             'ratings' => [
                 'count' => Rating::where('story_id', $story->id)->count(),
@@ -279,7 +387,19 @@ class HomeController extends Controller
             ->latest()
             ->paginate(10);
 
-
+        $userHasStoryPurchase = false;
+        $purchasedChapterIds = [];
+        if (auth()->check()) {
+            $userId = auth()->id();
+            $userHasStoryPurchase = $story->purchases()->where('user_id', $userId)->exists();
+            $chapterIds = collect($chapters->items())->pluck('id');
+            if ($chapterIds->isNotEmpty()) {
+                $purchasedChapterIds = \App\Models\ChapterPurchase::where('user_id', $userId)
+                    ->whereIn('chapter_id', $chapterIds)
+                    ->pluck('chapter_id')
+                    ->all();
+            }
+        }
 
         return view('pages.story', compact(
             'story',
@@ -288,7 +408,9 @@ class HomeController extends Controller
             'chapters',
             'pinnedComments',
             'regularComments',
-            'storyCategories'
+            'storyCategories',
+            'userHasStoryPurchase',
+            'purchasedChapterIds'
         ));
     }
 

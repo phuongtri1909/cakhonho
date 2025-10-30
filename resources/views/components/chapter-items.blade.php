@@ -6,11 +6,10 @@
                 @php
                     $isPurchased = false;
                     $hasAccess = $chapter->is_free;
-                    
                     if (auth()->check()) {
                         $isAdminOrMod = in_array(auth()->user()->role, ['admin', 'mod']);
-                        $hasChapterPurchase = $chapter->purchases()->where('user_id', auth()->id())->exists();
-                        $hasStoryPurchase = $story->purchases()->where('user_id', auth()->id())->exists();
+                        $hasChapterPurchase = isset($purchasedChapterIds) && in_array($chapter->id, $purchasedChapterIds);
+                        $hasStoryPurchase = isset($userHasStoryPurchase) && $userHasStoryPurchase;
                         $isPurchased = $hasChapterPurchase || $hasStoryPurchase;
                         $hasAccess = $chapter->is_free || $isPurchased || $isAdminOrMod;
                     }
@@ -72,11 +71,10 @@
                 @php
                     $isPurchased = false;
                     $hasAccess = $chapter->is_free;
-                    
                     if (auth()->check()) {
                         $isAdminOrMod = in_array(auth()->user()->role, ['admin', 'mod']);
-                        $hasChapterPurchase = $chapter->purchases()->where('user_id', auth()->id())->exists();
-                        $hasStoryPurchase = $story->purchases()->where('user_id', auth()->id())->exists();
+                        $hasChapterPurchase = isset($purchasedChapterIds) && in_array($chapter->id, $purchasedChapterIds);
+                        $hasStoryPurchase = isset($userHasStoryPurchase) && $userHasStoryPurchase;
                         $isPurchased = $hasChapterPurchase || $hasStoryPurchase;
                         $hasAccess = $chapter->is_free || $isPurchased || $isAdminOrMod;
                     }
@@ -136,11 +134,10 @@
                 @php
                     $isPurchased = false;
                     $hasAccess = $chapter->is_free;
-                    
                     if (auth()->check()) {
                         $isAdminOrMod = in_array(auth()->user()->role, ['admin', 'mod']);
-                        $hasChapterPurchase = $chapter->purchases()->where('user_id', auth()->id())->exists();
-                        $hasStoryPurchase = $story->purchases()->where('user_id', auth()->id())->exists();
+                        $hasChapterPurchase = isset($purchasedChapterIds) && in_array($chapter->id, $purchasedChapterIds);
+                        $hasStoryPurchase = isset($userHasStoryPurchase) && $userHasStoryPurchase;
                         $isPurchased = $hasChapterPurchase || $hasStoryPurchase;
                         $hasAccess = $chapter->is_free || $isPurchased || $isAdminOrMod;
                     }

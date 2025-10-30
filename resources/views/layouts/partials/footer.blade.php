@@ -5,12 +5,10 @@
                 <!-- Logo and Description Column -->
                 <div class="col-12 col-md-6">
                     @php
-                        // Get the logo from LogoSite model
-                        $logoSite = \App\Models\LogoSite::first();
-                        $logoPath =
-                            $logoSite && $logoSite->logo
-                                ? Storage::url($logoSite->logo)
-                                : asset('assets/images/logo/logo_site.webp');
+                        // Use shared $logoSite from provider to avoid duplicate queries
+                        $logoPath = isset($logoSite) && $logoSite && $logoSite->logo
+                            ? Storage::url($logoSite->logo)
+                            : asset('assets/images/logo/logo_site.webp');
                     @endphp
                     <img height="90" src="{{ $logoPath }}" alt="{{ config('app.name') }} logo">
                     @if ($donate)

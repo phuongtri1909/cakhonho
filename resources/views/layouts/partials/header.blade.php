@@ -7,8 +7,10 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
     @php
-        $logoSite = \App\Models\LogoSite::first();
-        $logoPath = $logoSite && $logoSite->logo ? Storage::url($logoSite->logo) : asset('assets/images/logo/logo_site.webp');
+        // Use shared $logoSite from provider to avoid duplicate queries
+        $logoPath = isset($logoSite) && $logoSite && $logoSite->logo
+            ? Storage::url($logoSite->logo)
+            : asset('assets/images/logo/logo_site.webp');
     @endphp
 
     <title>@yield('title', 'Truyện Cá Khô Nhỏ - Đọc Truyện Online Miễn Phí')</title>

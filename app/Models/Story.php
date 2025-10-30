@@ -57,9 +57,6 @@ class Story extends Model
         return $this->hasMany(StoryPurchase::class);
     }
 
-    /**
-     * Check if a user has purchased this story combo
-     */
     public function isPurchasedBy($userId)
     {
         return $this->purchases()->where('user_id', $userId)->exists();
@@ -87,21 +84,26 @@ class Story extends Model
 
     public function getTotalViewsAttribute()
     {
-        return $this->chapters->sum('views');
+        if (array_key_exists('total_views', $this->attributes)) {
+            return (int) $this->attributes['total_views'];
+        }
+        if ($this->relationLoaded('chapters')) {
+            return (int) $this->chapters->sum('views');
+        }
+        return 0;
     }
 
     public function getAverageViewsAttribute()
     {
-        return $this->chapters_count > 0 ?
-            $this->total_views / $this->chapters_count : 0;
+        $chaptersCount = (int) ($this->chapters_count ?? 0);
+        $totalViews = (int) ($this->total_views ?? ($this->relationLoaded('chapters') ? $this->chapters->sum('views') : 0));
+        return $chaptersCount > 0 ? $totalViews / $chaptersCount : 0;
     }
 
     public function latestChapter()
     {
         return $this->hasOne(Chapter::class)
             ->where('status', self::STATUS_PUBLISHED)
-            ->orderByDesc('number');
+            ->latestOfMany('number');
     }
-
-    protected $with = ['categories'];
 }
