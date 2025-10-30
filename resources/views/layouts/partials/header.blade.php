@@ -31,9 +31,9 @@
     <meta name="twitter:description" content="@yield('description', 'Truyện Cá Khô Nhỏ - Kho truyện full, truyện tranh, tiểu thuyết online cập nhật nhanh nhất, giao diện thân thiện, dễ đọc.')">
     <meta name="twitter:image" content="{{ $logoPath }}">
     <meta name="twitter:image:alt" content="@yield('title', 'Truyện Cá Khô Nhỏ - Đọc Truyện Online Miễn Phí')">
-    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('favicon.ico') }}?v={{ time() }}" type="image/x-icon">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v={{ time() }}" type="image/x-icon">
     <meta name="author" content="Truyện Cá Khô Nhỏ">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link rel="canonical" href="{{ url()->current() }}">
