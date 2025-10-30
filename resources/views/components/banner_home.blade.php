@@ -75,15 +75,27 @@
 
         .banner-slider {
             width: 100%;
-            height: 400px;
+            height: auto;
+        }
+        .banner-slider .swiper-wrapper,
+        .banner-slider .swiper-slide {
+            height: auto;
         }
 
         .banner-slide {
             width: 100%;
-            height: 100%;
+            height: 450px;
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
+            background-color: #000;
             position: relative;
+        }
+
+        @media (max-width: 768px) {
+            .banner-slide {
+                height: 350px;
+            }
         }
 
         .banner-slide::before {
@@ -146,22 +158,20 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Swiper
             new Swiper('.banner-slider', {
-                // Optional parameters
                 loop: true,
                 effect: 'fade',
                 autoplay: {
                     delay: 3000,
+                    disableOnInteraction: false, 
+                    pauseOnMouseEnter: true,
                 },
 
-                // Navigation arrows
                 navigation: {
                     nextEl: '.swiper-button-next',
                     prevEl: '.swiper-button-prev',
                 },
 
-                // Pagination
                 pagination: {
                     el: '.swiper-pagination',
                     clickable: true,
