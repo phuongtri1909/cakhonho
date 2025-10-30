@@ -122,13 +122,35 @@
             </li> --}}
 
             <li class="nav-item">
-                <a class="nav-link {{ Route::currentRouteNamed('users.index') ? 'active' : '' }}"
+                <a class="nav-link {{ Route::currentRouteNamed('users.*') ? 'active' : '' }}"
                     href="{{ route('users.index') }}">
                     <div
                         class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="fa-solid fa-users text-dark icon-sidebar"></i>
                     </div>
                     <span class="nav-link-text ms-1">Danh sách User</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ Route::currentRouteNamed('admin.coins.*') ? 'active' : '' }}"
+                    href="{{ route('admin.coins.index') }}">
+                    <div
+                        class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fa-solid fa-coins text-dark icon-sidebar"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Quản lý cám
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ Route::currentRouteNamed('admin.coin.transactions') ? 'active' : '' }}"
+                    href="{{ route('admin.coin.transactions') }}">
+                    <div
+                        class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fa-solid fa-history text-dark icon-sidebar"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Kiểm soát cám thủ công</span>
                 </a>
             </li>
 

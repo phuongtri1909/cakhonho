@@ -34,7 +34,7 @@ class UserController extends Controller
         }
 
         // Only show active users
-        if ($user->active !== 'active') {
+        if (!in_array($authUser->role, ['admin','mod']) && $user->active !== 'active') {
             abort(404);
         }
 

@@ -19,12 +19,13 @@ use App\Http\Controllers\ReadingController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SocialsController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\FacebookController;
 use App\Http\Controllers\LogoSiteController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\Admin\CoinController;
 use App\Http\Controllers\Admin\ConfigController;
 use App\Http\Controllers\Admin\SocialController;
 use App\Http\Controllers\RecentlyReadController;
-use App\Http\Controllers\FacebookController;
 use App\Http\Controllers\CommentReactionController;
 use App\Http\Controllers\Admin\BankController as AdminBankController;
 
@@ -162,6 +163,11 @@ Route::group(['middleware' => 'check.ip.ban'], function () {
                         Route::post('socials', [SocialController::class, 'store'])->name('socials.store');
                         Route::put('socials/{social}', [SocialController::class, 'update'])->name('socials.update');
                         Route::delete('socials/{social}', [SocialController::class, 'destroy'])->name('socials.destroy');
+
+                        Route::get('coins', [CoinController::class, 'index'])->name('coins.index');
+                        Route::get('coins/{user}/create', [CoinController::class, 'create'])->name('coins.create');
+                        Route::post('coins/{user}', [CoinController::class, 'store'])->name('coins.store');
+                        Route::get('coin-transactions', [CoinController::class, 'transactions'])->name('coin.transactions');
                     });
                 });
             });
