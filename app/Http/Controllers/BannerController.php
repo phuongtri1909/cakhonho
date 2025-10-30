@@ -101,17 +101,17 @@ class BannerController extends Controller
     {
         $validatedData = $this->validateBanner($request, $banner->id);
 
-        // Handle image upload
         if ($request->hasFile('image')) {
-            // Delete old image
             if ($banner->image) {
-                Storage::delete('public/' . $banner->image);
+                Storage::disk('public')->delete($banner->image);
+                $base = pathinfo($banner->image, PATHINFO_FILENAME);
+                $dir = dirname($banner->image);
+                Storage::disk('public')->delete([$dir . '/desktop_' . $base . '.webp', $dir . '/mobile_' . $base . '.webp', $dir . '/desktop_' . $base . '.png', $dir . '/mobile_' . $base . '.png']);
             }
 
             $validatedData['image'] = $this->processImage($request->file('image'));
         }
 
-        // Handle link requirement based on story_id
         if (empty($validatedData['story_id']) && empty($validatedData['link'])) {
             return back()->withInput()->withErrors(['link' => 'Link là bắt buộc khi không chọn truyện']);
         }
@@ -126,9 +126,11 @@ class BannerController extends Controller
      */
     public function destroy(Banner $banner)
     {
-        // Delete image if exists
         if ($banner->image) {
-            Storage::delete('public/' . $banner->image);
+            Storage::disk('public')->delete($banner->image);
+            $base = pathinfo($banner->image, PATHINFO_FILENAME);
+            $dir = dirname($banner->image);
+            Storage::disk('public')->delete([$dir . '/desktop_' . $base . '.webp', $dir . '/mobile_' . $base . '.webp', $dir . '/desktop_' . $base . '.png', $dir . '/mobile_' . $base . '.png']);
         }
 
         $banner->delete();
@@ -157,35 +159,60 @@ class BannerController extends Controller
      */
     private function processImage($image)
     {
-        $filename = uniqid() . '_' . time() . '.' . $image->getClientOriginalExtension();
-        $path = 'banners/' . $filename;
+        $supportsWebp = function_exists('imagewebp');
+        $extension = $supportsWebp ? 'webp' : 'png';
+        $baseName = uniqid() . '_' . time();
 
-        // Desktop version (original size)
+        $dir = 'banners';
+        $mainPath = $dir . '/' . $baseName . '.' . $extension;
+        $desktopPath = $dir . '/desktop_' . $baseName . '.' . $extension;
+        $mobilePath = $dir . '/mobile_' . $baseName . '.' . $extension;
+
+        if (!Storage::disk('public')->exists($dir)) {
+            Storage::disk('public')->makeDirectory($dir);
+        }
+
+        // Desktop version
         $desktopImg = Image::make($image->getRealPath())
             ->resize(1920, null, function ($constraint) {
                 $constraint->aspectRatio();
                 $constraint->upsize();
-            })
-            ->encode('webp', 80); // 80% quality
+            });
+        try {
+            if ($supportsWebp) {
+                $desktopImg->encode('webp', 80);
+            } else {
+                $desktopImg->encode('png', 90);
+            }
+        } catch (\Throwable $e) {
+            $extension = 'png';
+            $desktopPath = $dir . '/desktop_' . $baseName . '.png';
+            $mobilePath = $dir . '/mobile_' . $baseName . '.png';
+            $mainPath = $dir . '/' . $baseName . '.png';
+            $desktopImg->encode('png', 90);
+        }
+        Storage::disk('public')->put($desktopPath, $desktopImg->stream());
 
-        Storage::put('public/banners/desktop_' . $filename, $desktopImg);
-
-        // Mobile version
         $mobileImg = Image::make($image->getRealPath())
             ->resize(767, null, function ($constraint) {
                 $constraint->aspectRatio();
                 $constraint->upsize();
-            })
-            ->encode('webp', 70); // 70% quality
+            });
+        if ($extension === 'webp' && $supportsWebp) {
+            $mobileImg->encode('webp', 70);
+        } else {
+            $mobileImg->encode('png', 90);
+        }
+        Storage::disk('public')->put($mobilePath, $mobileImg->stream());
 
-        Storage::put('public/banners/mobile_' . $filename, $mobileImg);
+        $mainImg = Image::make($image->getRealPath());
+        if ($extension === 'webp' && $supportsWebp) {
+            $mainImg->encode('webp', 90);
+        } else {
+            $mainImg->encode('png', 90);
+        }
+        Storage::disk('public')->put($mainPath, $mainImg->stream());
 
-        // Save original with reduced quality
-        $mainImg = Image::make($image->getRealPath())
-            ->encode('webp', 90); // 90% quality
-
-        Storage::put('public/' . $path, $mainImg);
-
-        return $path;
+        return $mainPath;
     }
 }

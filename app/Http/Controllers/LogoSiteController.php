@@ -14,7 +14,6 @@ class LogoSiteController extends Controller
      */
     public function index()
     {
-        // Get the first logo site or create a new one if none exists
         $logoSite = LogoSite::first() ?? new LogoSite();
         
         return view('admin.pages.logo-site.edit', compact('logoSite'));
@@ -25,7 +24,6 @@ class LogoSiteController extends Controller
      */
     public function edit()
     {
-        // Get the first logo site or create a new one if none exists
         $logoSite = LogoSite::first() ?? new LogoSite();
         
         return view('admin.pages.logo-site.edit', compact('logoSite'));
@@ -56,7 +54,6 @@ class LogoSiteController extends Controller
             try {
                 $logoPath = $this->processLogo($request->file('logo'));
             } catch (\Throwable $e) {
-                // If image processing fails (e.g., WEBP not supported), store original file
                 $logoPath = $request->file('logo')->store('logos', 'public');
             }
 
@@ -77,11 +74,10 @@ class LogoSiteController extends Controller
     }
     
     /**
-     * Process and optimize the uploaded logo
+     * Process and save the uploaded logo
      */
     private function processLogo($image)
     {
-        // Ensure logos directory exists on the public disk
         if (!Storage::disk('public')->exists('logos')) {
             Storage::disk('public')->makeDirectory('logos');
         }
@@ -94,7 +90,6 @@ class LogoSiteController extends Controller
 
         $imageInstance = Image::make($image->getRealPath());
 
-        // Optional: keep original size; if you want to constrain, add ->resize(...)
         try {
             if ($supportsWebp) {
                 $imageInstance->encode('webp', 90);
@@ -102,7 +97,6 @@ class LogoSiteController extends Controller
                 $imageInstance->encode('png', 90);
             }
         } catch (\Throwable $e) {
-            // Fallback to PNG if encoding to WebP fails at runtime
             $extension = 'png';
             $filename = 'site_logo_' . time() . '.' . $extension;
             $path = 'logos/' . $filename;

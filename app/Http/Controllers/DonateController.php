@@ -14,7 +14,6 @@ class DonateController extends Controller
      */
     public function edit()
     {
-        // Get the first donate record or create a new one if none exists
         $donate = Donate::first() ?? new Donate();
         
         return view('admin.pages.donate.edit', compact('donate'));
@@ -40,25 +39,20 @@ class DonateController extends Controller
             'about_us.string' => 'Về chúng tôi phải là chuỗi ký tự',
         ]);
         
-        // Get existing record or create new
         $donate = Donate::first();
         if (!$donate) {
             $donate = new Donate();
         }
         
-        // Update text fields
         $donate->title = $validatedData['title'];
         $donate->description = $validatedData['description'];
         $donate->about_us = $validatedData['about_us'];
         
-        // Handle QR code image upload
         if ($request->hasFile('image_qr')) {
-            // Delete old image if exists
             if ($donate->image_qr) {
-                Storage::delete('public/' . $donate->image_qr);
+                Storage::disk('public')->delete($donate->image_qr);
             }
             
-            // Process and save new image
             $qrPath = $this->processQRImage($request->file('image_qr'));
             $donate->image_qr = $qrPath;
         }
@@ -73,23 +67,34 @@ class DonateController extends Controller
      */
     private function processQRImage($image)
     {
-        // Create directory if not exists
-        if (!Storage::exists('public/donate')) {
-            Storage::makeDirectory('public/donate');
+        if (!Storage::disk('public')->exists('donate')) {
+            Storage::disk('public')->makeDirectory('donate');
         }
         
-        $filename = 'qr_code_' . time() . '.webp';
+        $supportsWebp = function_exists('imagewebp');
+        $extension = $supportsWebp ? 'webp' : 'png';
+        $filename = 'qr_code_' . time() . '.' . $extension;
         $path = 'donate/' . $filename;
         
-        // Process image - keep reasonable size for QR code readability
         $img = Image::make($image->getRealPath())
             ->resize(300, 300, function ($constraint) {
                 $constraint->aspectRatio();
                 $constraint->upsize();
-            })
-            ->encode('webp', 90); // Convert to WebP with 90% quality for QR readability
+            });
+        try {
+            if ($supportsWebp) {
+                $img->encode('webp', 90);
+            } else {
+                $img->encode('png', 90);
+            }
+        } catch (\Throwable $e) {
+            $extension = 'png';
+            $filename = 'qr_code_' . time() . '.png';
+            $path = 'donate/' . $filename;
+            $img->encode('png', 90);
+        }
         
-        Storage::put('public/' . $path, $img);
+        Storage::disk('public')->put($path, $img->stream());
         
         return $path;
     }
