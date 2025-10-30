@@ -52,8 +52,14 @@ class LogoSiteController extends Controller
             if ($logoSite->logo) {
                 Storage::delete('public/' . $logoSite->logo);
             }
-            
-            $logoPath = $this->processLogo($request->file('logo'));
+
+            try {
+                $logoPath = $this->processLogo($request->file('logo'));
+            } catch (\Throwable $e) {
+                // If image processing fails (e.g., WEBP not supported), store original file
+                $logoPath = $request->file('logo')->store('logos', 'public');
+            }
+
             $logoSite->logo = $logoPath;
         }
         
@@ -75,21 +81,36 @@ class LogoSiteController extends Controller
      */
     private function processLogo($image)
     {
-        // Create directory if not exists
-        if (!Storage::exists('public/logos')) {
-            Storage::makeDirectory('public/logos');
+        // Ensure logos directory exists on the public disk
+        if (!Storage::disk('public')->exists('logos')) {
+            Storage::disk('public')->makeDirectory('logos');
         }
-        
-        $filename = 'site_site_' . time() . '.webp';
+
+        $supportsWebp = function_exists('imagewebp');
+
+        $extension = $supportsWebp ? 'webp' : 'png';
+        $filename = 'site_logo_' . time() . '.' . $extension;
         $path = 'logos/' . $filename;
-        
-        // Resize height to 50px and maintain aspect ratio
-        $img = Image::make($image->getRealPath())
-            
-            ->encode('webp', 100);
-        
-        Storage::put('public/' . $path, $img);
-        
+
+        $imageInstance = Image::make($image->getRealPath());
+
+        // Optional: keep original size; if you want to constrain, add ->resize(...)
+        try {
+            if ($supportsWebp) {
+                $imageInstance->encode('webp', 90);
+            } else {
+                $imageInstance->encode('png', 90);
+            }
+        } catch (\Throwable $e) {
+            // Fallback to PNG if encoding to WebP fails at runtime
+            $extension = 'png';
+            $filename = 'site_logo_' . time() . '.' . $extension;
+            $path = 'logos/' . $filename;
+            $imageInstance->encode('png', 90);
+        }
+
+        Storage::disk('public')->put($path, $imageInstance->stream());
+
         return $path;
     }
     
