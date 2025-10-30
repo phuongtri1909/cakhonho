@@ -24,6 +24,7 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\Admin\ConfigController;
 use App\Http\Controllers\Admin\SocialController;
 use App\Http\Controllers\RecentlyReadController;
+use App\Http\Controllers\FacebookController;
 use App\Http\Controllers\CommentReactionController;
 use App\Http\Controllers\Admin\BankController as AdminBankController;
 
@@ -191,6 +192,9 @@ Route::group(['middleware' => 'check.ip.ban'], function () {
 
             Route::get('auth/google', [AuthController::class, 'redirectToGoogle'])->name('login.google');
             Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+
+            Route::get('auth/facebook', [FacebookController::class, 'redirectToFacebook'])->name('login.facebook');
+            Route::get('auth/facebook/callback', [FacebookController::class, 'handleFacebookCallback'])->name('auth.facebook.callback');
         });
     });
 });

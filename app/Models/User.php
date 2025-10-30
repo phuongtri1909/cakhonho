@@ -35,8 +35,17 @@ class User extends Authenticatable
         'ip_address',
         'rating',
         'recently_read',
-        'coins'
+        'coins',
+        'facebook_id',
+        'google_id',
     ];
+
+    const ACTIVE_ACTIVE = 'active';
+    const ACTIVE_INACTIVE = 'inactive';
+
+    const ROLE_ADMIN = 'admin';
+    const ROLE_MOD = 'mod';
+    const ROLE_USER = 'user';
 
     public function deposits()
     {
