@@ -100,6 +100,17 @@ class Story extends Model
         return $chaptersCount > 0 ? $totalViews / $chaptersCount : 0;
     }
 
+    public function getAverageRatingAttribute()
+    {
+        if (array_key_exists('average_rating', $this->attributes)) {
+            return (float) ($this->attributes['average_rating'] ?? 0);
+        }
+        if ($this->relationLoaded('ratings')) {
+            return (float) ($this->ratings->avg('rating') ?? 0);
+        }
+        return 0.0;
+    }
+
     public function latestChapter()
     {
         return $this->hasOne(Chapter::class)

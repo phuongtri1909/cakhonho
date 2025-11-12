@@ -15,7 +15,7 @@
 
         <!-- Stories Grid -->
         <div id="storiesContainer" class="bg-white rounded-bottom-custom">
-            @include('components.stories-grid', ['hotStories' => $hotStories])
+            @include('components.stories-grid', ['hotStories' => $list_story])
         </div>
     </div>
 </section>

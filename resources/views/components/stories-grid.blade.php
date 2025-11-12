@@ -38,9 +38,9 @@
                     <div class="story-stats-container mt-2 mb-0">
                         <div class="d-flex justify-content-between">
                             <span><i class="fas fa-eye eye text-primary"></i>
-                                {{ number_format($story->total_views) }}</span>
+                                {{ number_format($story->total_views ?? 0) }}</span>
                             <span><i class="fas fa-star star cl-ffe371"></i>
-                                {{ number_format($story->average_rating, 1) }}</span>
+                                {{ number_format($story->average_rating ?? 0, 1) }}</span>
                         </div>
                     </div>
                 </div>

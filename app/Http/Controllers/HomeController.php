@@ -196,14 +196,30 @@ class HomeController extends Controller
                     $q->select('chapters.id','chapters.story_id','chapters.title','chapters.slug','chapters.number','chapters.created_at','chapters.status')
                       ->where('status', Chapter::STATUS_PUBLISHED);
                 }
-            ])->whereIn('id', $allIds)->get()->keyBy('id');
+            ])
+            ->withSum(['chapters as total_views' => function ($q) {
+                $q->where('status', 'published');
+            }], 'views')
+            ->withAvg('ratings as average_rating', 'rating')
+            ->whereIn('id', $allIds)->get()->keyBy('id');
 
             $dailyHotStories = collect($dailyHotStories)->map(fn($id) => $hydrated->get($id))->filter();
             $weeklyHotStories = collect($weeklyHotStories)->map(fn($id) => $hydrated->get($id))->filter();
             $monthlyHotStories = collect($monthlyHotStories)->map(fn($id) => $hydrated->get($id))->filter();
 
             if ($hotStories instanceof \Illuminate\Support\Collection) {
-                $hotStories = $hotStories->map(fn($s) => $hydrated->get($s->id) ?? $s);
+                $hotStories = $hotStories->map(function($s) use ($hydrated) {
+                    $hydratedStory = $hydrated->get($s->id);
+                    if ($hydratedStory) {
+                        $hydratedStory->total_views = $s->total_views ?? $hydratedStory->total_views ?? 0;
+                        $hydratedStory->average_rating = $s->average_rating ?? $hydratedStory->average_rating ?? 0.0;
+                        $hydratedStory->hot_score = $s->hot_score ?? 0;
+                        $hydratedStory->recent_views = $s->recent_views ?? 0;
+                        $hydratedStory->chapters_count = $s->chapters_count ?? $hydratedStory->chapters_count ?? 0;
+                        return $hydratedStory;
+                    }
+                    return $s;
+                });
             }
             if ($newStories instanceof \Illuminate\Support\Collection) {
                 $newStories = $newStories->map(fn($s) => $hydrated->get($s->id) ?? $s);
@@ -251,7 +267,13 @@ class HomeController extends Controller
             }], 'views')
             ->withSum(['chapters as total_views' => function ($q) {
                 $q->where('status', 'published');
-            }], 'views');
+            }], 'views')
+            ->withAvg('ratings as average_rating', 'rating')
+            ->with(['categories:id,name,slug'])
+            ->addSelect([
+                DB::raw('COALESCE((SELECT SUM(views) FROM chapters WHERE chapters.story_id = stories.id AND chapters.status = "published"), 0) as total_views_calc'),
+                DB::raw('COALESCE((SELECT AVG(rating) FROM ratings WHERE ratings.story_id = stories.id), 0) as average_rating_calc')
+            ]);
 
         if ($request->category_id) {
             $query->whereHas('categories', function ($q) use ($request) {
@@ -261,6 +283,15 @@ class HomeController extends Controller
 
         $hotStories = $query->get()
             ->map(function ($story) {
+                $totalViews = (int) ($story->total_views_calc ?? $story->getAttribute('total_views') ?? 0);
+                $avgRating = (float) ($story->average_rating_calc ?? $story->getAttribute('average_rating') ?? 0.0);
+                
+                $story->setAttribute('total_views', $totalViews);
+                $story->total_views = $totalViews;
+                
+                $story->setAttribute('average_rating', $avgRating);
+                $story->average_rating = $avgRating;
+                
                 $story->hot_score = $this->calculateHotScore($story);
                 return $story;
             })
